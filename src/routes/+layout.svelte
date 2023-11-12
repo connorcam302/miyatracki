@@ -1,4 +1,6 @@
 <script lang="ts">
+	import '../app.css';
+
 	import { page } from '$app/stores';
 	import { invalidate } from '$app/navigation';
 	import { onMount } from 'svelte';
@@ -6,8 +8,8 @@
 
 	export let data;
 
-	let { supabase, session } = data;
-	$: ({ supabase, session } = data);
+	let { supabase, session, userData } = data;
+	$: ({ supabase, session, userData } = data);
 
 	onMount(() => {
 		const {
@@ -22,14 +24,21 @@
 	});
 </script>
 
-{#if $page.url.pathname !== '/auth'}
-	<div>
-		{#if session}
-			<p>Logged in as {session.user.email}</p>
-			<button on:click={() => supabase.auth.signOut()}>Sign out</button>
-		{:else}
-			<button on:click={() => goto('/auth')}>Sign in</button>
-		{/if}
-	</div>
-{/if}
-<slot />
+<div class="bg-stone-700 min-h-screen relative">
+	{#if $page.url.pathname !== '/auth'}
+		<div class="bg-stone-800 px-2 h-10 text-lg text-stone-200 flex">
+			<div class="my-auto flex grow gap-3">
+				<span class="flex-none">miyatracki</span>
+				<div class="flex-auto grow" />
+				{#if session}
+					<p>@{userData.displayName}</p>
+					<img src={userData.profilePicture} class="object-cover h-8 w-8" />
+					<button on:click={() => supabase.auth.signOut()}>sign out</button>
+				{:else}
+					<button on:click={() => goto('/auth')}>sign in</button>
+				{/if}
+			</div>
+		</div>
+	{/if}
+	<slot />
+</div>

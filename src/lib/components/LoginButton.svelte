@@ -1,5 +1,4 @@
 <script>
-	import { signIn } from '$lib/supabase';
 	export let provider = 'Not Set';
 
 	const fill = new Map();
@@ -9,16 +8,34 @@
 	fill.set('google', '#FFFFFF');
 	border.set('google', '#747775');
 	font.set('google', '#1F1F1F');
+
+	fill.set('discord', '#5865F2');
+	border.set('discord', '#5865F2');
+	font.set('discord', '#FFFFFF');
+
+	fill.set('twitch', '#9146FF');
+	border.set('twitch', '#9146FF');
+	font.set('twitch', '#F0F0FF');
+
+	fill.set('facebook', '#1877F2');
+	border.set('facebook', '#1877F2');
+	font.set('facebook', '#FFFFFF');
+
+	fill.set('twitter', '#000000');
+	border.set('twitter', '#000000');
+	font.set('twitter', '#FFFFFF');
 </script>
 
-<button
-	class={`bg-${fill[provider]} border-${border[provider]} text-${font[provider]} border-2 rounded-xl p-2`}
-	on:click={() => signIn(provider)}
+<div
+	class={`border-2 rounded-2xl px-2 w-56 overflow-hidden h-11 flex items-center`}
+	style={`border-color: ${border.get(provider)};
+            background-color: ${fill.get(provider)}; 
+            color: ${font.get(provider)}`}
 >
-	<div class="flex m-auto items-center h-10">
-		<img src={`/${provider}-logo.svg`} alt={`${provider} logo`} class="pr-3" />
+	<div class="flex items-center">
+		<img src={`/${provider}-logo.svg`} alt={`${provider} logo`} class="pr-3 w-10" />
 		<span class="inline-block">
 			Sign in with {provider.charAt(0).toUpperCase() + provider.slice(1)}
 		</span>
 	</div>
-</button>
+</div>

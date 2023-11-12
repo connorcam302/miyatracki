@@ -3,28 +3,7 @@
 	let { supabase } = data;
 	$: ({ supabase } = data);
 
-	let email;
-	let password;
-
-	console.log(supabase.auth.getSession());
-
-	const handleSignUp = async () => {
-		await supabase.auth.signUp({
-			email,
-			password,
-			options: {
-				emailRedirectTo: `${location.origin}/auth/callback`
-			}
-		});
-	};
-
-	const handleSignIn = async () => {
-		let data = await supabase.auth.signInWithPassword({
-			email,
-			password
-		});
-		console.log(data);
-	};
+	import LoginButton from '$lib/components/LoginButton.svelte';
 
 	const handleSignInOauth = async (provider) => {
 		let returnData = await supabase.auth.signInWithOAuth({
@@ -39,14 +18,12 @@
 	const handleSignOut = async () => {
 		await supabase.auth.signOut();
 	};
+
+	const providers = ['google', 'discord', 'twitch'];
 </script>
 
-<form on:submit={handleSignUp}>
-	<input name="email" bind:value={email} />
-	<input type="password" name="password" bind:value={password} />
-	<button>Sign up</button>
-</form>
-
-<button on:click={() => handleSignInOauth('google')}> Sign in with Google </button>
-<button on:click={handleSignIn}>Sign in</button>
-<button on:click={handleSignOut}>Sign out</button>
+<div class="flex flex-col items-center gap-3">
+	{#each providers as provider}
+		<button on:click={() => handleSignInOauth(provider)}><LoginButton {provider} /></button>
+	{/each}
+</div>
