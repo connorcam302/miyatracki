@@ -1,7 +1,10 @@
-<h1>SvelteKit Auth Example</h1>
-<p>
-  This is an example site to demonstrate how to use <a
-    href="https://kit.svelte.dev/">SvelteKit</a
-  >
-  with <a href="https://sveltekit.authjs.dev">SvelteKit Auth</a> for authentication.
-</p>
+<script lang="ts">
+	export let data;
+</script>
+
+{#if data.session}
+	<p>client-side data fetching with RLS</p>
+	<p>Hey, {data.session.user.id}</p>
+{:else}
+	<p>no session</p>
+{/if}
