@@ -2,6 +2,7 @@
 	export let data;
 	let { supabase } = data;
 	$: ({ supabase } = data);
+    const BASE_URL = import.meta.env.VITE_BASE_URL;
 
 	import LoginButton from '$lib/components/LoginButton.svelte';
 
@@ -9,7 +10,7 @@
 		let returnData = await supabase.auth.signInWithOAuth({
 			provider,
 			options: {
-				redirectTo: `http://localhost:5173/auth/callback`
+				redirectTo: `${BASE_URL}/auth/callback`
 			}
 		});
 		console.log(returnData);
