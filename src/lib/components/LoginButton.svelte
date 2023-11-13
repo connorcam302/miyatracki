@@ -34,7 +34,7 @@
 >
 	<div class="flex items-center">
 		<img src={`/${provider}-logo.svg`} alt={`${provider} logo`} class="pr-3 w-10" />
-		<span class="inline-block">
+		<span class="inline-block font-display">
 			Sign in with {provider.charAt(0).toUpperCase() + provider.slice(1)}
 		</span>
 	</div>
