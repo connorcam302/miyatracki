@@ -1,0 +1,263 @@
+{
+  "id": "00000000-0000-0000-0000-000000000000",
+  "prevId": "",
+  "version": "5",
+  "dialect": "sqlite",
+  "tables": {
+    "Users": {
+      "name": "Users",
+      "columns": {
+        "user_id": {
+          "autoincrement": false,
+          "name": "user_id",
+          "type": "integer",
+          "primaryKey": true,
+          "notNull": false
+        },
+        "username": {
+          "autoincrement": false,
+          "name": "username",
+          "type": "text",
+          "primaryKey": false,
+          "notNull": true
+        }
+      },
+      "compositePrimaryKeys": {},
+      "indexes": {},
+      "foreignKeys": {},
+      "uniqueConstraints": {}
+    },
+    "Games": {
+      "name": "Games",
+      "columns": {
+        "game_id": {
+          "autoincrement": false,
+          "name": "game_id",
+          "type": "integer",
+          "primaryKey": true,
+          "notNull": false
+        },
+        "user_id": {
+          "autoincrement": false,
+          "name": "user_id",
+          "type": "integer",
+          "primaryKey": false,
+          "notNull": true
+        },
+        "game_title": {
+          "autoincrement": false,
+          "name": "game_title",
+          "type": "text",
+          "primaryKey": false,
+          "notNull": true
+        },
+        "game_platform": {
+          "autoincrement": false,
+          "name": "game_platform",
+          "type": "text",
+          "primaryKey": false,
+          "notNull": false
+        },
+        "start_date": {
+          "autoincrement": false,
+          "name": "start_date",
+          "type": "numeric",
+          "primaryKey": false,
+          "notNull": false
+        },
+        "end_date": {
+          "autoincrement": false,
+          "name": "end_date",
+          "type": "numeric",
+          "primaryKey": false,
+          "notNull": false
+        }
+      },
+      "compositePrimaryKeys": {},
+      "indexes": {},
+      "foreignKeys": {
+        "Games_user_id_Users_user_id_fk": {
+          "name": "Games_user_id_Users_user_id_fk",
+          "tableFrom": "Games",
+          "tableTo": "Users",
+          "columnsFrom": [
+            "user_id"
+          ],
+          "columnsTo": [
+            "user_id"
+          ],
+          "onDelete": "no action",
+          "onUpdate": "no action"
+        }
+      },
+      "uniqueConstraints": {}
+    },
+    "Runs": {
+      "name": "Runs",
+      "columns": {
+        "run_id": {
+          "autoincrement": false,
+          "name": "run_id",
+          "type": "integer",
+          "primaryKey": true,
+          "notNull": false
+        },
+        "game_id": {
+          "autoincrement": false,
+          "name": "game_id",
+          "type": "integer",
+          "primaryKey": false,
+          "notNull": true
+        },
+        "run_start_date": {
+          "autoincrement": false,
+          "name": "run_start_date",
+          "type": "numeric",
+          "primaryKey": false,
+          "notNull": true
+        },
+        "run_end_date": {
+          "autoincrement": false,
+          "name": "run_end_date",
+          "type": "numeric",
+          "primaryKey": false,
+          "notNull": false
+        },
+        "is_completed": {
+          "default": 0,
+          "autoincrement": false,
+          "name": "is_completed",
+          "type": "numeric",
+          "primaryKey": false,
+          "notNull": true
+        }
+      },
+      "compositePrimaryKeys": {},
+      "indexes": {},
+      "foreignKeys": {
+        "Runs_game_id_Games_game_id_fk": {
+          "name": "Runs_game_id_Games_game_id_fk",
+          "tableFrom": "Runs",
+          "tableTo": "Games",
+          "columnsFrom": [
+            "game_id"
+          ],
+          "columnsTo": [
+            "game_id"
+          ],
+          "onDelete": "no action",
+          "onUpdate": "no action"
+        }
+      },
+      "uniqueConstraints": {}
+    },
+    "Bosses": {
+      "name": "Bosses",
+      "columns": {
+        "boss_id": {
+          "autoincrement": false,
+          "name": "boss_id",
+          "type": "integer",
+          "primaryKey": true,
+          "notNull": false
+        },
+        "boss_name": {
+          "autoincrement": false,
+          "name": "boss_name",
+          "type": "text",
+          "primaryKey": false,
+          "notNull": true
+        }
+      },
+      "compositePrimaryKeys": {},
+      "indexes": {},
+      "foreignKeys": {},
+      "uniqueConstraints": {}
+    },
+    "BossDeathsInRun": {
+      "name": "BossDeathsInRun",
+      "columns": {
+        "death_id": {
+          "autoincrement": false,
+          "name": "death_id",
+          "type": "integer",
+          "primaryKey": true,
+          "notNull": false
+        },
+        "run_id": {
+          "autoincrement": false,
+          "name": "run_id",
+          "type": "integer",
+          "primaryKey": false,
+          "notNull": true
+        },
+        "boss_id": {
+          "autoincrement": false,
+          "name": "boss_id",
+          "type": "integer",
+          "primaryKey": false,
+          "notNull": true
+        },
+        "death_count": {
+          "autoincrement": false,
+          "name": "death_count",
+          "type": "integer",
+          "primaryKey": false,
+          "notNull": true
+        },
+        "death_date": {
+          "autoincrement": false,
+          "name": "death_date",
+          "type": "numeric",
+          "primaryKey": false,
+          "notNull": false
+        },
+        "killed_by_user": {
+          "default": 0,
+          "autoincrement": false,
+          "name": "killed_by_user",
+          "type": "numeric",
+          "primaryKey": false,
+          "notNull": true
+        }
+      },
+      "compositePrimaryKeys": {},
+      "indexes": {},
+      "foreignKeys": {
+        "BossDeathsInRun_boss_id_Bosses_boss_id_fk": {
+          "name": "BossDeathsInRun_boss_id_Bosses_boss_id_fk",
+          "tableFrom": "BossDeathsInRun",
+          "tableTo": "Bosses",
+          "columnsFrom": [
+            "boss_id"
+          ],
+          "columnsTo": [
+            "boss_id"
+          ],
+          "onDelete": "no action",
+          "onUpdate": "no action"
+        },
+        "BossDeathsInRun_run_id_Runs_run_id_fk": {
+          "name": "BossDeathsInRun_run_id_Runs_run_id_fk",
+          "tableFrom": "BossDeathsInRun",
+          "tableTo": "Runs",
+          "columnsFrom": [
+            "run_id"
+          ],
+          "columnsTo": [
+            "run_id"
+          ],
+          "onDelete": "no action",
+          "onUpdate": "no action"
+        }
+      },
+      "uniqueConstraints": {}
+    }
+  },
+  "enums": {},
+  "_meta": {
+    "schemas": {},
+    "tables": {},
+    "columns": {}
+  }
+}
