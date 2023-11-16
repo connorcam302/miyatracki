@@ -2,23 +2,26 @@ import { PUBLIC_SUPABASE_ANON_KEY, PUBLIC_SUPABASE_URL } from '$env/static/publi
 import { createSupabaseLoadClient } from '@supabase/auth-helpers-sveltekit';
 
 export const load = async ({ fetch, data, depends }) => {
-	depends('supabase:auth');
+    depends('supabase:auth');
 
-	const supabase = createSupabaseLoadClient({
-		supabaseUrl: PUBLIC_SUPABASE_URL,
-		supabaseKey: PUBLIC_SUPABASE_ANON_KEY,
-		event: { fetch },
-		serverSession: data.session
-	});
+    const supabase = createSupabaseLoadClient({
+        supabaseUrl: PUBLIC_SUPABASE_URL,
+        supabaseKey: PUBLIC_SUPABASE_ANON_KEY,
+        event: { fetch },
+        serverSession: data.session
+    });
 
-	const {
-		data: { session }
-	} = await supabase.auth.getSession();
+    const {
+        data: { session }
+    } = await supabase.auth.getSession();
 
-	let userData = null;
-	if (data.userData !== null) {
-		userData = data.userData.data[0];
-	}
+    if (session && session.user) {
+        const userDataResponse = await fetch(`/api/user/uid/${data.session.user.id}`);
+        const userDataJson = await userDataResponse.json();
+        const userData: userDataType = userDataJson.data[0];
 
-	return { supabase, session, userData };
+        return { supabase, session, userData };
+    } else {
+        return { supabase, session, userData: null };
+    }
 };

@@ -11,6 +11,9 @@
 
 	let { supabase, session, userData } = data;
 	$: ({ supabase, session, userData } = data);
+	console.log('page', {
+		userData
+	});
 
 	onMount(() => {
 		const {
@@ -27,7 +30,7 @@
 
 <div class="bg-stone-700 min-h-screen relative">
 	{#if $page.url.pathname !== '/auth'}
-		<div class="bg-stone-800 px-2 h-10 text-lg text-stone-200 flex">
+		<div class="bg-stone-800 px-2 h-10 text-lg text-stone-200 flex sm:px">
 			<div class="pr-2">
 				<Flame />
 			</div>
@@ -40,7 +43,7 @@
 				<button id="link" class="text-3xl" data-text="link3">link3</button>
 				<div class="flex-auto grow" />
 				<div class="flex items-center gap-2">
-					{#if session}
+					{#if session && userData}
 						<img src={userData.profilePicture} class="object-cover h-8 w-8" alt="profile" />
 						<button on:click={() => supabase.auth.signOut()}>sign out</button>
 					{:else}

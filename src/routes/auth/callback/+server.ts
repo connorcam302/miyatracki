@@ -8,6 +8,7 @@ export const GET = async (event) => {
         url,
         locals: { supabase }
     } = event;
+    console.log('callback hit');
     const code = url.searchParams.get('code') as string;
 
     if (code) {
@@ -17,6 +18,7 @@ export const GET = async (event) => {
             const { data } = await supabase.auth.getSession();
             const user = data.session.user;
             const userExist = await db.select().from(userTable).where(eq(userTable.uid, user.id));
+            console.log(userExist);
             if (userExist.length === 0) {
                 console.log('User does not exist, creating user.');
                 await db.insert(userTable).values({
