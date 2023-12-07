@@ -73,7 +73,7 @@
 				<div class="pr-2">
 					<Flame />
 				</div>
-				<button id class="mr-3 text-[#ffdc01] text-3xl" on:click={() => goto('/')}
+				<button id class="mr-3 text-white text-3xl font-title" on:click={() => goto('/')}
 					>miyatracki</button
 				>
 			</div>

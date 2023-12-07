@@ -18,6 +18,7 @@
 
 	.fire {
 		position: relative;
+		margin-left: 2px;
 		top: 50%;
 		left: 50%;
 		transform: translate(-50%, -50%);
@@ -49,38 +50,14 @@
 					animation-delay: 0s;
 				}
 				&:nth-child(2) {
-					animation-delay: $animationtime / 4;
+					animation-delay: calc($animationtime / 4);
 				}
 				&:nth-child(3) {
-					animation-delay: $animationtime / 4 * 2;
+					animation-delay: calc($animationtime / 4) * 2;
 				}
 				&:nth-child(4) {
-					animation-delay: $animationtime / 4 * 3;
+					animation-delay: calc($animationtime / 4) * 3;
 				}
-			}
-		}
-		.logs {
-			position: absolute;
-			bottom: 25%;
-			left: 50%;
-			transform: translateX(-50%);
-			width: 100%;
-			height: 15%;
-			&:before,
-			&:after {
-				position: absolute;
-				content: '';
-				top: 50%;
-				left: 50%;
-				transform: translate(-50%, -50%) rotate(20deg);
-				height: 100%;
-				width: 100%;
-				border-radius: 1vw;
-				background-color: $brownl;
-			}
-			&:before {
-				transform: translate(-50%, -50%) rotate(-20deg);
-				background-color: $brownd;
 			}
 		}
 	}
