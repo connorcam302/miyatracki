@@ -6,8 +6,8 @@
 	import { onMount } from 'svelte';
 	import { goto } from '$app/navigation';
 	import Flame from '$lib/components/Flame.svelte';
-	import LogoutIcon from '~icons/iconoir/log-out';
-	import LoginIcon from '~icons/iconoir/log-in';
+	import LogoutIcon from 'virtual:icons/iconoir/log-out';
+	import LoginIcon from 'virtual:icons/iconoir/log-in';
 
 	export let data;
 
