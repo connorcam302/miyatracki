@@ -10,7 +10,5 @@ export const load = async ({ fetch, data }) => {
 		return { id: game.gameId, name: game.gameTitle, bosses: gameBosses };
 	});
 
-	gameData.unshift({ id: 0, name: 'All', bosses });
-
 	return { gameData };
 };

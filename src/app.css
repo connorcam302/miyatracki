@@ -2,6 +2,11 @@
 @tailwind components;
 @tailwind utilities;
 
+html {
+	scroll-behavior: smooth;
+	@apply text-stone-200;
+}
+
 body {
 	background-color: hsla(106, 0%, 9%, 1);
 	background-image: radial-gradient(at 20% 89%, hsla(19, 52%, 20%, 0.43) 0px, transparent 50%),
