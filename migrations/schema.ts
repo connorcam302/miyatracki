@@ -43,7 +43,7 @@ export const runs = sqliteTable("Runs", {
 	gameId: integer("game_id").notNull().references(() => games.gameId),
 	runStartDate: integer("run_start_date").notNull(),
 	runEndDate: integer("run_end_date"),
-	runUser: text("run_user").notNull().references(() => user.id),
+	runUser: integer("run_user").notNull().references(() => user.id),
 	experience: integer("experience").notNull(),
 	runName: numeric("run_name").notNull(),
 });

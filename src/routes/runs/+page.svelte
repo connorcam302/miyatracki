@@ -8,7 +8,6 @@
 	export let data;
 
 	const { games, userData, runs } = data;
-    console.log(runs)
 
 	let nameValue;
 	let experienceValue = 0;
@@ -20,8 +19,6 @@
 	experienceDescription.set(1, 'Your first playthrough of this game.');
 	experienceDescription.set(2, 'You have played this game once before.');
 	experienceDescription.set(3, 'You have played this game multiple times before.');
-
-	$: console.log(experienceValue);
 
 	const regenerateName = () => {
 		nameValue = uniqueNamesGenerator({
