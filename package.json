@@ -41,6 +41,7 @@
 		"@auth/core": "^0.18.0",
 		"@auth/drizzle-adapter": "^0.3.5",
 		"@auth/sveltekit": "^0.3.11",
+		"@iconify-json/iconoir": "^1.1.36",
 		"@libsql/client": "^0.3.6",
 		"@lucia-auth/adapter-sqlite": "^2.0.1",
 		"@supabase/auth-helpers-sveltekit": "^0.10.7",
