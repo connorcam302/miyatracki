@@ -3,24 +3,41 @@
 	import ChildBox from '$lib/components/ChildBox.svelte';
 	import Togglable from '$lib/components/Togglable.svelte';
 	import { blur } from 'svelte/transition';
+	import { page } from '$app/stores';
+	import { goto } from '$app/navigation';
 
 	export let data;
 
 	let { gameData } = data;
 	const allGames = gameData;
-
+	let urlGame = $page.url.searchParams.get('game');
 	let currentGame = allGames;
+	let id = 0;
+
+	if (urlGame) {
+		id = parseInt(urlGame);
+	}
+	currentGame = allGames.filter((game) => {
+		if (id === 0) {
+			return allGames;
+		} else {
+			return game.id === id;
+		}
+	});
 
 	const setGame = (id) => {
 		currentGame = allGames.filter((game) => {
 			if (id === 0) {
 				return allGames;
 			} else {
+				$page.url.searchParams.set('game', id);
+				goto(`?${$page.url.searchParams.toString()}`);
 				return game.id === id;
 			}
 		});
 	};
-	$: console.log(currentGame);
+
+	console.log(currentGame);
 </script>
 
 <div>

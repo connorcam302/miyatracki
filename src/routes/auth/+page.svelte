@@ -15,7 +15,6 @@
 				redirectTo: `${env.PUBLIC_BASE_URL}/auth/callback`
 			}
 		});
-		console.log(returnData);
 	};
 
 	const links = [

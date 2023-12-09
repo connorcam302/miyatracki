@@ -1,8 +1,6 @@
 export const POST = async ({ cookies, request }) => {
 	const session = request.body ? await request.json() : null;
-	console.log('/cookie/session');
 	if (session) {
-		console.log('session', session);
 		const { refresh_token, access_token, user } = session;
 		const cookies_to_set = Object.entries({
 			'sb-user': user,

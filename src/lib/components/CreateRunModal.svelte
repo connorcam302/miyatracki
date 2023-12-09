@@ -1,6 +1,7 @@
 <script>
 	import { closeModal, closeAllModals, openModal, modals } from 'svelte-modals';
-	import { fly } from 'svelte/transition';
+	import { slide } from 'svelte/transition';
+	import { quintOut } from 'svelte/easing';
 
 	export let isOpen;
 	export let title;
@@ -12,7 +13,14 @@
 
 {#if isOpen}
 	<!-- on:introstart and on:outroend are required to transition 1 at a time between modals -->
-	<div role="dialog" class="modal" transition:fly={{ y: 50 }} on:introstart on:outroend>
+	<div
+		role="dialog"
+		class="modal"
+		out:slide={{ delay: 250, duration: 300, easing: quintOut, axis: 'x' }}
+		in:slide={{ duration: 300, easing: quintOut, axis: 'x' }}
+		on:introstart
+		on:outroend
+	>
 		<div class="contents">
 			<h2>{title}</h2>
 			<p>{message}</p>
@@ -35,7 +43,6 @@
 		top: 0;
 		bottom: 0;
 		right: 0;
-		left: 0;
 		display: flex;
 		justify-content: center;
 		align-items: center;
