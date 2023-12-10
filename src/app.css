@@ -1,3 +1,21 @@
 @tailwind base;
 @tailwind components;
 @tailwind utilities;
+
+html {
+	scroll-behavior: smooth;
+	@apply text-stone-200;
+}
+
+body {
+	background-color: hsla(106, 0%, 9%, 1);
+	background-image: radial-gradient(at 20% 89%, hsla(19, 52%, 20%, 0.43) 0px, transparent 50%),
+		radial-gradient(at 88% 23%, hsla(0, 0%, 20%, 1) 0px, transparent 50%),
+		radial-gradient(at 33% 36%, hsla(42, 74%, 20%, 0.53) 0px, transparent 50%),
+		radial-gradient(at 86% 73%, hsla(42, 74%, 20%, 0.53) 0px, transparent 50%);
+
+	background-attachment: fixed;
+	background-position: center;
+	background-repeat: no-repeat;
+	background-size: cover;
+}

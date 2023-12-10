@@ -10,6 +10,7 @@
 		"sourceMap": true,
         "strict": true,
         "noImplicitAny": false,
+        "types": ["unplugin-icons/types/vue"]
 	},
       "include": [
     "src/**/*.ts", // Include TypeScript files

@@ -1,0 +1,218 @@
+-- Populate Games Table with FromSoftware Soulslike games
+INSERT INTO Games(game_title) VALUES
+("Dark Souls"),
+("Dark Souls II"),
+("Dark Souls III"),
+("Bloodborne"),
+("Sekiro: Shadows Die Twice"),
+("Elden Ring"),
+("Demon""s Souls");
+
+-- Populate DLC Table with DLC order based on release
+INSERT INTO DLC (dlc_title, dlc_order, dlc_game) VALUES
+("Artorias of the Abyss", 1, 2),
+("Old Hunters", 1, 5),
+("Crown of the Sunken King", 1, 3),
+("Crown of the Old Iron King", 2, 3),
+("Crown of the Ivory King", 3, 3),
+("Ashes of Ariandel", 1, 4),
+("The Ringed City", 2, 4),
+("Elden Ring - TBA DLC", 1, 7);
+
+-- Populate Bosses Table for Demon"s Souls
+INSERT INTO Bosses(boss_name, boss_game, boss_optional, boss_dlc) VALUES
+("Phalanx", 1, 0, NULL),
+("Tower Knight", 1, 0, NULL),
+("Armor Spider", 1, 0, NULL)
+("Flamelurker", 1, 0, NULL),
+("Adjudicator", 1, 0, NULL),
+("Fool""s Idol", 1, 0, NULL),
+("Dragon God", 1, 0, NULL),
+("Leechmonger", 1, 0, NULL),
+("Old Hero", 1, 0, NULL),
+("Maneater", 1, 0, NULL),
+("Penetrator", 1, 0, NULL),
+("Storm King", 1, 0, NULL),
+("Old Monk", 1, 0, NULL),
+("Dirty Colossus", 1, 0, NULL),
+("Maiden Astraea", 1, 0, NULL),
+("Old King Allant", 1, 0, NULL);
+
+-- Populate Bosses Table for Dark Souls (game_id: 2)
+INSERT INTO Bosses (boss_name, boss_game, boss_optional, boss_dlc) VALUES
+("Asylum Demon", 2, 0, NULL),
+("Taurus Demon", 2, 0, NULL),
+("Bell Gargoyle", 2, 0, NULL),
+("Capra Demon", 2, 0, NULL),
+("Gaping Dragon", 2, 0, NULL),
+("Quelaag", 2, 0, NULL),
+("Iron Golem", 2, 0, NULL),
+("Ornstein and Smough", 2, 0, NULL),
+("Sif", 2, 0, NULL),
+("Four Kings", 2, 0, NULL),
+("Seath the Scaleless", 2, 0, NULL),
+("Gravelord Nito", 2, 0, NULL),
+("Bed of Chaos", 2, 0, NULL),
+("Gwyn, Lord of Cinder", 2, 0, NULL),
+("Moonlight Butterfly", 2, 1, NULL),
+("Stray Demon", 2, 1, NULL),
+("Dark Sun Gwyndolin", 2, 1, NULL),
+("Crossbreed Priscilla", 2, 1, NULL),
+("Ceaseless Discharge", 2, 1, NULL),
+("Centipede Demon", 2, 1, NULL),
+("Demon Firesage", 2, 1, NULL),
+("Knight Artorias", 2, 0, 1),
+("Sanctuary Guardian", 2, 0, 1),
+("Manus, Father of the Abyss", 2, 0, 1),
+("Black Dragon Kalameet", 2, 0, 1);
+
+-- Populate Bosses Table for Dark Souls II (game_id: 3)
+INSERT INTO Bosses (boss_name, boss_game, boss_optional, boss_dlc) VALUES
+("Last Giant", 3, 1, NULL),
+("The Pursuer", 3, 1, NULL),
+("Dragonrider", 3, 1, NULL),
+("Ruin Sentinels", 3, 1, NULL),
+("Lost Sinner", 3, 1, NULL),
+("Old Dragonslayer", 3, 1, NULL),
+("Executioner""s Chariot", 3, 1, NULL),
+("Skeleton Lords", 3, 1, NULL),
+("Covetous Demon", 3, 1, NULL),
+("Mytha, the Baneful Queen", 3, 1, NULL),
+("Smelter Demon", 3, 1, NULL),
+("Old Iron King", 3, 1, NULL),
+("Flexile Sentry", 3, 1, NULL),
+("Belfry Gargoyles", 3, 1, NULL),
+("Royal Rat Vanguard", 3, 1, NULL),
+("The Rotten", 3, 1, NULL),
+("Scorpioness Najka", 3, 1, NULL),
+("Royal Rat Authority", 3, 1, NULL),
+("Covetous Demon", 3, 1, NULL),
+("The Duke""s Dear Freja", 3, 1, NULL),
+("Dragonrider x2", 3, 1, NULL),
+("Looking Glass Knight", 3, 0, NULL),
+("Demon of Song", 3, 0, NULL),
+("Vestaldt, the Royal Aegis", 3, 0, NULL),
+("Guardian Dragon", 3, 0, NULL),
+("Ancient Dragon", 3, 0, NULL),
+("Giant Lord", 3, 0, NULL),
+("Elana, the Squalid Queen", 3, 1, 3), 
+("Sinh, the Slumbering Dragon", 3, 1, 3), 
+("The Graverobber, Varg, and Cerah", 3, 1, 3),
+("Darklurker", 3, 1, NULL),
+("Fume Knight", 3, 1, 4),
+("Sir Alonne", 3, 1, 4),
+("Smelter Demon (Blue)", 3, 1, 4),
+("Aava, the King""s Pet", 3, 1, 5),
+("Burnt Ivory King", 3, 1, 5),
+("Lud and Zallen, The King""s Pets", 3, 1, 5),
+("Darklurker", 3, 1, NULL),
+("King Vendrick", 3, 0, NULL),
+("Throne Watcher & Throne Defender", 3, 0, NULL),
+("Nashandra", 3, 0, NULL),
+("Aldia, Scholar of the First Sin", 3, 1, NULL);
+
+-- Populate Bosses Table for Dark Souls III (game_id: 4)
+INSERT INTO Bosses (boss_name, boss_game, boss_optional, boss_dlc) VALUES
+("Iudex Gundyr", 4, 0, NULL), -- Main boss, not optional, not in DLC
+("Vordt of the Boreal Valley", 4, 0, NULL), -- Main boss, not optional, not in DLC
+("Curse-rotted Greatwood", 4, 1, NULL), -- Optional boss
+("Crystal Sage", 4, 0, NULL), -- Main boss, not optional, not in DLC
+("Abyss Watchers", 4, 0, NULL), -- Main boss, not optional, not in DLC
+("Deacons of the Deep", 4, 0, NULL), -- Main boss, not optional, not in DLC
+("High Lord Wolnir", 4, 0, NULL), -- Main boss, not optional, not in DLC
+("Old Demon King", 4, 1, NULL), -- Optional boss
+("Pontiff Sulyvahn", 4, 0, NULL), -- Main boss, not optional, not in DLC
+("Aldrich, Devourer of Gods", 4, 0, NULL), -- Main boss, not optional, not in DLC
+("Yhorm the Giant", 4, 0, NULL), -- Main boss, not optional, not in DLC
+("Dancer of the Boreal Valley", 4, 0, NULL), -- Main boss, not optional, not in DLC
+("Oceiros, the Consumed King", 4, 1, NULL), -- Optional boss
+("Champion Gundyr", 4, 1, NULL), -- Optional boss
+("Lothric, Younger Prince", 4, 0, NULL), -- Main boss, not optional, not in DLC
+("Ancient Wyvern", 4, 1, NULL), -- Optional boss
+("The Nameless King", 4, 1, NULL), -- Optional boss
+("Soul of Cinder", 4, 0, NULL), -- Main boss, not optional, not in DLC
+("Champion's Gravetender and Gravetender Greatwolf", 4, 1, 6), -- Optional boss from Ashes of Ariandel DLC
+("Sister Friede", 4, 0, 6), -- Main boss from Ashes of Ariandel DLC
+("Demon in Pain & Demon from Below", 4, 0, 7), -- Main boss from The Ringed City DLC
+("Halflight, Spear of the Church", 4, 0, 7), -- Main boss from The Ringed City DLC
+("Darkeater Midir", 4, 1, 7), -- Optional boss from The Ringed City DLC
+("Slave Knight Gael", 4, 0, 7); -- Main boss from The Ringed City DLC
+
+-- Main Game and The Old Hunters DLC
+INSERT INTO Bosses (boss_name, boss_game, boss_optional, boss_dlc) VALUES
+("Cleric Beast", 5, 1, NULL),
+("Father Gascoigne", 5, 0, NULL),
+("Blood-starved Beast", 5, 1, NULL),
+("Witches of Hemwick", 5, 1, NULL),
+("Darkbeast Paarl", 5, 1, NULL),
+("Vicar Amelia", 5, 0, NULL),
+("Shadows of Yharnam", 5, 0, NULL),
+("Rom, the Vacuous Spider", 5, 0, NULL),
+("The One Reborn", 5, 0, NULL),
+("Micolash, Host of the Nightmare", 5, 0, NULL),
+("Martyr Logarius", 5, 1, NULL),
+("Celestial Emissary", 5, 1, NULL),
+("Ebrietas, Daughter of the Cosmos", 5, 1, NULL),
+("Mergo's Wet Nurse", 5, 0, NULL),
+("Gehrman, the First Hunter", 5, 1, NULL),
+("Moon Presence", 5, 1, NULL),
+("Amygdala", 5, 1, NULL),
+("Ludwig, the Accursed & Holy Blade", 5, 0, 2),
+("Laurence, the First Vicar", 5, 1, 2),
+("Living Failures", 5, 0, 2),
+("Lady Maria of the Astral Clocktower", 5, 0, 2),
+("Orphan of Kos", 5, 0, 2);
+
+-- Populate Bosses Table for Sekiro: Shadows Die Twice (game_id: 6)
+INSERT INTO Bosses (boss_name, boss_game, boss_optional, boss_dlc) VALUES
+('Gyoubu Masataka Oniwa', 6, NULL, NULL),
+('Lady Butterfly', 6, NULL, NULL),
+('Genichiro Ashina', 6, NULL, NULL),
+('Folding Screen Monkeys', 6, NULL, NULL),
+('Guardian Ape', 6, NULL, NULL),
+('Headless Ape', 6, NULL, NULL),
+('Corrupted Monk', 6, NULL, NULL),
+('Isshin Ashina', 6, NULL, NULL),
+('Great Shinobi Owl', 6, NULL, NULL),
+('True Corrupted Monk', 6, NULL, NULL),
+('Divine Dragon', 6, NULL, NULL),
+('Owl (Father)', 6, NULL, NULL),
+('Demon of Hatred', 6, NULL, NULL),
+('Isshin, the Sword Saint', 6, NULL, NULL),
+('Inner Father', 6, NULL, NULL),
+('Inner Genichiro', 6, NULL, NULL),
+('Inner Isshin', 6, NULL, NULL);
+
+
+-- Populate Bosses Table for Elden Ring (game_id: 7)
+INSERT INTO Bosses (boss_name, boss_game, boss_optional, boss_dlc) VALUES
+('Margit the Fell Omen', 7, NULL, NULL),
+('Godrick the Grafted', 7, NULL, NULL),
+('Red Wolf of Radagon', 7, NULL, NULL),
+('Rennala, Queen of the Full Moon', 7, NULL, NULL),
+('Leonine Misbegotten (Castle Morne)', 7, NULL, NULL),
+('Ancestor Spirit', 7, NULL, NULL),
+('Starscourge Radahn', 7, NULL, NULL),
+('Magma Wyrm Makar', 7, NULL, NULL),
+('Mimic Tear (Nokron, Eternal City)', 7, NULL, NULL),
+('Royal Knight Loretta', 7, NULL, NULL),
+('Regal Ancestor Spirit', 7, NULL, NULL),
+('Dragonkin Soldier of Nokstella', 7, NULL, NULL),
+('Valiant Gargoyles', 7, NULL, NULL),
+('Astel, Naturalborn of the Void', 7, NULL, NULL),
+('Godskin Noble (Volcano Manor)', 7, NULL, NULL),
+('Rykard, Lord of Blasphemy', 7, NULL, NULL),
+('Elemer of the Briar', 7, NULL, NULL),
+('Godfrey, First Elden Lord (Golden Shade)', 7, NULL, NULL),
+('Morgott the Omen King', 7, NULL, NULL),
+('Mohg, the Omen', 7, NULL, NULL),
+('Commander Niall', 7, NULL, NULL),
+('Fire Giant', 7, NULL, NULL),
+('Loretta, Knight of the Haligtree', 7, NULL, NULL),
+('Malenia, Blade of Miquella', 7, NULL, NULL),
+('Godskin Duo', 7, NULL, NULL),
+('Dragonlord Placidusax', 7, NULL, NULL),
+('Maliketh, the Black Blade', 7, NULL, NULL),
+('Lichdragon Fortissax', 7, NULL, NULL),
+('Mohg, Lord of Blood', 7, NULL, NULL),
+('Hoarah Loux, Warrior', 7, NULL, NULL);
