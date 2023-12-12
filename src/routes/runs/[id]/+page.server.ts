@@ -7,6 +7,7 @@ import {
 	userTable
 } from '$lib/server/schema';
 import { eq } from 'drizzle-orm';
+import { getDateString, getBossWithSoonestDeath, getKillButtonInfo } from '$lib/functions';
 
 export const load = async ({ fetch, data, params }) => {
 	const runDataArray = await db
@@ -21,10 +22,13 @@ export const load = async ({ fetch, data, params }) => {
 		id: runData.Runs.runId,
 		gameId: runData.Games.gameId,
 		gameTitle: runData.Games.gameTitle,
-		runName: runData.Runs.runName,
-		runStartDate: runData.Runs.runStartDate,
-		runEndDate: runData.Runs.runEndDate,
-		experience: runData.Runs.experience
+		name: runData.Runs.runName,
+		startDate: runData.Runs.runStartDate,
+		startDateString: getDateString(runData.Runs.runStartDate),
+		endDate: runData.Runs.runEndDate,
+		endDateString: runData.Runs.runEndDate ? getDateString(runData.Runs.runEndDate) : null,
+		experience: runData.Runs.experience,
+		latestKill: null
 	};
 
 	const bossesData = await db
@@ -35,13 +39,20 @@ export const load = async ({ fetch, data, params }) => {
 		.where(eq(bossesTable.bossGame, run.gameId));
 
 	const bosses = bossesData.map((boss) => {
+		const { buttonColour, buttonText } = getKillButtonInfo(boss.Bosses.bossId);
+
 		return {
 			id: boss.Bosses.bossId,
 			name: boss.Bosses.bossName,
 			deaths: boss.BossDeathsInRun?.deathCount ?? 0,
-			deathDate: boss.BossDeathsInRun?.deathDate ?? null
+			deathDate: boss.BossDeathsInRun?.deathDate ?? null,
+			buttonText,
+			buttonColour
 		};
 	});
+
+	run.latestKill =
+		getBossWithSoonestDeath(bosses) !== null ? getBossWithSoonestDeath(bosses) : 'No bosses killed';
 
 	const user = {
 		id: runData.User.id,

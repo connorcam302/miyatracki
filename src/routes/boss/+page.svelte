@@ -36,8 +36,6 @@
 			}
 		});
 	};
-
-	console.log(currentGame);
 </script>
 
 <div>
