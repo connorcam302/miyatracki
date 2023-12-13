@@ -41,7 +41,7 @@ export const bossDeathsInRunTable = sqliteTable('BossDeathsInRun', {
 		.notNull()
 		.references(() => bossesTable.bossId),
 	deathCount: integer('death_count').notNull(),
-	deathDate: numeric('death_date')
+	deathDate: integer('death_date')
 });
 
 export const runsTable = sqliteTable('Runs', {

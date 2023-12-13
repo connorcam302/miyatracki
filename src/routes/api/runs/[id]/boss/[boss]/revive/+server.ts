@@ -20,22 +20,14 @@ export const POST: RequestHandler = async ({ url, params }) => {
 		.from(bossDeathsInRunTable)
 		.where(and(eq(bossDeathsInRunTable.runId, id), eq(bossDeathsInRunTable.bossId, boss)));
 
-	if (bossDeathsCurrent.length == 0 || bossDeathsCurrent[0].deathCount == 0) {
-		return json(customResponse(400, 'Death count already at 0.'));
-	}
-
-	if (bossDeathsCurrent[0].deathCount == 1) {
-		const data = await db
-			.delete(bossDeathsInRunTable)
-			.where(and(eq(bossDeathsInRunTable.runId, id), eq(bossDeathsInRunTable.bossId, boss)))
-			.returning();
-		return json(customResponse(200, 'Deleted boss death.', [data]));
+	if (bossDeathsCurrent.length == 0 && bossDeathsCurrent[0].deathDate == null) {
+		return json(customResponse(400, `Boss ${boss} is not dead.`));
 	}
 
 	const data = await db
 		.update(bossDeathsInRunTable)
-		.set({ deathCount: bossDeathsCurrent[0].deathCount - 1 })
+		.set({ deathDate: null })
 		.where(and(eq(bossDeathsInRunTable.runId, id), eq(bossDeathsInRunTable.bossId, boss)))
 		.returning();
-	return json(customResponse(200, `Updated boss death count.`, [data]));
+	return json(customResponse(200, 'Boss marked dead.', [data]));
 };

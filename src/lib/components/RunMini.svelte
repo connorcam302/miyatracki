@@ -15,8 +15,6 @@
 	import { goto } from '$app/navigation';
 	import { getTimeSinceEpoch, getExperienceTitle } from '$lib/functions';
 
-	let lastBoss = 'No bosses defeated';
-
 	const { unit, count } = getTimeSinceEpoch(runStartDate);
 </script>
 
@@ -26,7 +24,6 @@
 		<div>{runName}</div>
 		<div>{gameTitle}</div>
 		<div>{getExperienceTitle(experience)}</div>
-		<div>{lastBoss}</div>
 		<div>{`${count} ${unit}${count !== 1 ? 's' : ''}`} ago</div>
 	</ChildBox>
 </button>

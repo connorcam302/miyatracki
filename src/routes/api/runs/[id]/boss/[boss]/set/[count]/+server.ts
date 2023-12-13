@@ -8,6 +8,7 @@ export const POST: RequestHandler = async ({ url, params }) => {
 	console.log(url.pathname, 'requested.');
 	const boss = Number(params.boss);
 	const id = Number(params.id);
+	const deathCount = Number(params.count);
 
 	const runExists = await db.select().from(runsTable).where(eq(runsTable.runId, id));
 
@@ -26,7 +27,7 @@ export const POST: RequestHandler = async ({ url, params }) => {
 			.values({
 				runId: id,
 				bossId: boss,
-				deathCount: 1
+				deathCount: deathCount
 			})
 			.returning();
 		return json(customResponse(200, 'Created boss death.', [data]));
@@ -34,7 +35,7 @@ export const POST: RequestHandler = async ({ url, params }) => {
 
 	const data = await db
 		.update(bossDeathsInRunTable)
-		.set({ deathCount: bossDeathsCurrent[0].deathCount + 1 })
+		.set({ deathCount: deathCount })
 		.where(and(eq(bossDeathsInRunTable.runId, id), eq(bossDeathsInRunTable.bossId, boss)))
 		.returning();
 	return json(customResponse(200, `Updated boss death count.`, [data]));

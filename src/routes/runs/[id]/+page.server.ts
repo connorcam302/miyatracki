@@ -7,7 +7,12 @@ import {
 	userTable
 } from '$lib/server/schema';
 import { eq } from 'drizzle-orm';
-import { getDateString, getBossWithSoonestDeath, getKillButtonInfo } from '$lib/functions';
+import {
+	getDateString,
+	getBossWithSoonestDeath,
+	getKillButtonInfo,
+	getTimeSinceEpoch
+} from '$lib/functions';
 
 export const load = async ({ fetch, data, params }) => {
 	const runDataArray = await db
@@ -39,15 +44,21 @@ export const load = async ({ fetch, data, params }) => {
 		.where(eq(bossesTable.bossGame, run.gameId));
 
 	const bosses = bossesData.map((boss) => {
-		const { buttonColour, buttonText } = getKillButtonInfo(boss.Bosses.bossId);
+		const { killColour, killText } = getKillButtonInfo(boss.Bosses.bossId);
 
 		return {
 			id: boss.Bosses.bossId,
 			name: boss.Bosses.bossName,
 			deaths: boss.BossDeathsInRun?.deathCount ?? 0,
 			deathDate: boss.BossDeathsInRun?.deathDate ?? null,
-			buttonText,
-			buttonColour
+			deathDateString: boss.BossDeathsInRun?.deathDate
+				? getDateString(boss.BossDeathsInRun?.deathDate)
+				: null,
+			deathTimeSince: boss.BossDeathsInRun?.deathDate
+				? getTimeSinceEpoch(boss.BossDeathsInRun?.deathDate)
+				: null,
+			killText,
+			killColour
 		};
 	});
 
@@ -59,6 +70,8 @@ export const load = async ({ fetch, data, params }) => {
 		displayName: runData.User.displayName,
 		profilePicture: runData.User.profilePicture
 	};
+
+	console.log('backend called');
 
 	return { run, user, bosses };
 };

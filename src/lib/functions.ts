@@ -132,51 +132,56 @@ export const getBossWithSoonestDeath = (deathArray) => {
 	return soonestDeathObject;
 };
 
+/**
+ * Returns data for the boss kill text and colour.
+ * @param bossId The ID of the boss.
+ * @returns An object containing the boss kill text and colour.
+ */
 export const getKillButtonInfo = (bossId: number) => {
 	// Demon's Souls
 	if (bossId <= 16) {
-		return { buttonText: 'Demon Vanquished', buttonColour: '#FFFFFF' };
+		return { killText: 'Demon Vanquished', killColour: '#FFFFFF' };
 	}
 	// Dark Souls
 	if (bossId <= 41) {
-		return { buttonText: 'Victory Achieved', buttonColour: '#f0a91b' };
+		return { killText: 'Victory Achieved', killColour: '#f0a91b' };
 	}
 	// Dark Souls 2
 	if (bossId <= 83) {
 		const soulBearers = [46, 61, 53, 57];
 		if (soulBearers.includes(bossId)) {
-			return { buttonText: 'Great Soul Embraced', buttonColour: '#f0a91b' };
+			return { killText: 'Great Soul Embraced', killColour: '#f0a91b' };
 		}
-		return { buttonText: 'Victory Achieved', buttonColour: '#f0a91b' };
+		return { killText: 'Victory Achieved', killColour: '#f0a91b' };
 	}
 	// Dark Souls 3
 	if (bossId <= 107) {
 		const lordsOfCinder = [88, 90, 93, 98, 101];
 		if (lordsOfCinder.includes(bossId)) {
-			return { buttonText: 'Lord of Cinder Fallen', buttonColour: '#F05E1B' };
+			return { killText: 'Lord of Cinder Fallen', killColour: '#F05E1B' };
 		}
-		return { buttonText: 'Heir of Fire Destroyed', buttonColour: '#f0a91b' };
+		return { killText: 'Heir of Fire Destroyed', killColour: '#f0a91b' };
 	}
 	// Bloodborne
 	if (bossId <= 129) {
 		const nightmares = [121, 123, 129];
 		if (nightmares.includes(bossId)) {
-			return { buttonText: 'Nightmare Slain', buttonColour: '#A5372C' };
+			return { killText: 'Nightmare Slain', killColour: '#A5372C' };
 		}
-		return { buttonText: 'Prey Slaughtered', buttonColour: '#81A389' };
+		return { killText: 'Prey Slaughtered', killColour: '#81A389' };
 	}
 	// Sekiro
 	if (bossId <= 146) {
 		// Immortalilty Severed
 		const immortalBosses = [139, 143, 146];
 		if (immortalBosses.includes(bossId)) {
-			return { buttonText: 'Immortality Severed', buttonColour: '#FFFFFF' };
+			return { killText: 'Immortality Severed', killColour: '#FFFFFF' };
 		}
 		// Divine Dragon
 		if (bossId == 140) {
-			return { buttonText: 'Gracious Gift of Tears', buttonColour: '#F8CFD2' };
+			return { killText: 'Gracious Gift of Tears', killColour: '#F8CFD2' };
 		}
-		return { buttonText: 'Shinobi Execution', buttonColour: '#FFFFFF' };
+		return { killText: 'Shinobi Execution', killColour: '#FFFFFF' };
 	}
 	// Elden Ring
 	if (bossId <= 177) {
@@ -184,14 +189,23 @@ export const getKillButtonInfo = (bossId: number) => {
 		const demigods = [148, 153, 165, 162, 166, 170];
 		// Radagon/Elden Beast
 		if (bossId == 177) {
-			return { buttonText: 'God Slain', buttonColour: '#F6CD39' };
+			return { killText: 'God Slain', killColour: '#F6CD39' };
 		}
 		if (legends.includes(bossId)) {
-			return { buttonText: 'Legend Felled', buttonColour: '#F6CD39' };
+			return { killText: 'Legend Felled', killColour: '#F6CD39' };
 		}
 		if (demigods.includes(bossId)) {
-			return { buttonText: 'Demigod Felled', buttonColour: '#F6CD39' };
+			return { killText: 'Demigod Felled', killColour: '#F6CD39' };
 		}
-		return { buttonText: 'Great Enemy Felled', buttonColour: '#F6CD39' };
-	} else return { buttonText: 'Boss Killed', buttonColour: '#FFFFFF' };
+		return { killText: 'Great Enemy Felled', killColour: '#F6CD39' };
+	} else return { killText: 'Boss Killed', killColour: '#FFFFFF' };
+};
+
+/**
+ * Returns a truncated version of the given string.
+ * @param str The string to truncate.
+ * @returns The truncated string.
+ */
+export const truncateString = (str) => {
+	return str.length > 20 ? `${str.slice(0, 20)}...` : str;
 };
