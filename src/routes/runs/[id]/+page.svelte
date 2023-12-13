@@ -19,6 +19,7 @@
 	import { goto } from '$app/navigation';
 
 	const { run, bosses, user, userData } = data;
+	console.log(bosses);
 	let bossList = bosses;
 	let urlBoss = Number($page.url.searchParams.get('boss'));
 
@@ -234,47 +235,49 @@
 	<div class="">
 		<div class="flex flex-wrap justify-center h-full w-full">
 			<div class="relative rounded-[48px] bg-stone-700 py-5 px-5 m-2 bg-opacity-[.30] w-max">
-				<div
-					role="table"
-					class="flex absolute right-0 mr-8 mt-3"
-					on:mouseleave={() => closeOptions()}
-				>
-					{#if optionsVisible}
-						<div
-							transition:fade={{ duration: 100 }}
-							class="ml-5 flex flex-col gap-0 text-stone-800 bg-stone-200 hover:bg-stone-400 rounded-xl drop-shadow-md"
-						>
-							{#if currentBoss.deathDate}
-								<button
-									class="bg-stone-200 px-4 pt-1 rounded-t-xl border-solid border-2 border-b-0 border-stone-800 hover:bg-stone-400 transition-all"
-									on:click={() => toggleReviveModal()}>Revive Boss</button
-								>
-							{:else}
-								<div
-									class="bg-stone-600 px-4 pt-1 rounded-t-xl border-solid border-2 border-b-0 border-stone-800 transition-all"
-								>
-									Revive Boss
-								</div>
-							{/if}
+				{#if auth}
+					<div
+						role="table"
+						class="flex absolute right-0 mr-8 mt-3"
+						on:mouseleave={() => closeOptions()}
+					>
+						{#if optionsVisible}
 							<div
-								class="flex items-center justify-center border-solid border-2 border-y-0 border-stone-800"
+								transition:fade={{ duration: 100 }}
+								class="ml-5 flex flex-col gap-0 text-stone-800 bg-stone-200 hover:bg-stone-400 rounded-xl drop-shadow-md"
 							>
-								<div class=" h-[1px] w-11/12 bg-stone-800" />
+								{#if currentBoss.deathDate}
+									<button
+										class="bg-stone-200 px-4 pt-1 rounded-t-xl border-solid border-2 border-b-0 border-stone-800 hover:bg-stone-400 transition-all"
+										on:click={() => toggleReviveModal()}>Revive Boss</button
+									>
+								{:else}
+									<div
+										class="bg-stone-600 px-4 pt-1 rounded-t-xl border-solid border-2 border-b-0 border-stone-800 transition-all"
+									>
+										Revive Boss
+									</div>
+								{/if}
+								<div
+									class="flex items-center justify-center border-solid border-2 border-y-0 border-stone-800"
+								>
+									<div class=" h-[1px] w-11/12 bg-stone-800" />
+								</div>
+								<button
+									class="bg-stone-200 px-4 pb-1 rounded-b-xl border-solid border-2 border-t-0 border-stone-800 hover:bg-stone-400 transition-all"
+									on:click={() => toggleSetDeathsModal()}
+								>
+									Set Deaths
+								</button>
 							</div>
-							<button
-								class="bg-stone-200 px-4 pb-1 rounded-b-xl border-solid border-2 border-t-0 border-stone-800 hover:bg-stone-400 transition-all"
-								on:click={() => toggleSetDeathsModal()}
-							>
-								Set Deaths
+						{/if}
+						<div class="text-2xl">
+							<button on:click={() => toggleOptions()}>
+								<IconoirMoreHorizCircle />
 							</button>
 						</div>
-					{/if}
-					<div class="text-2xl">
-						<button on:click={() => toggleOptions()}>
-							<IconoirMoreHorizCircle />
-						</button>
 					</div>
-				</div>
+				{/if}
 				<div class="flex flex-col gap-2 w-80">
 					<img alt="profile" class="w-48 h-48 mx-auto mt-4" src={currentBoss.bossImage} />
 					<div class="h-16 flex justify-center items-center">

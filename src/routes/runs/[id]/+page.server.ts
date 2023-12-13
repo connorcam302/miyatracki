@@ -6,7 +6,7 @@ import {
 	runsTable,
 	userTable
 } from '$lib/server/schema';
-import { eq } from 'drizzle-orm';
+import { eq, and } from 'drizzle-orm';
 import {
 	getDateString,
 	getBossWithSoonestDeath,
@@ -39,27 +39,30 @@ export const load = async ({ fetch, data, params }) => {
 	const bossesData = await db
 		.select()
 		.from(bossesTable)
-		.leftJoin(bossDeathsInRunTable, eq(bossDeathsInRunTable.bossId, bossesTable.bossId))
-		.leftJoin(runsTable, eq(runsTable.runId, bossDeathsInRunTable.runId))
 		.where(eq(bossesTable.bossGame, run.gameId));
 
+	const deathData = await db
+		.select()
+		.from(bossDeathsInRunTable)
+		.where(eq(bossDeathsInRunTable.runId, run.id));
+
+	console.log(bossesData);
+
 	const bosses = bossesData.map((boss) => {
-		const { killColour, killText } = getKillButtonInfo(boss.Bosses.bossId);
+		const { killColour, killText } = getKillButtonInfo(boss.bossId);
+
+		const death = deathData.find((death) => death.bossId === boss.bossId);
 
 		return {
-			id: boss.Bosses.bossId,
+			id: boss.bossId,
 			bossImage:
-				boss.Bosses.bossImage ??
+				boss.bossImage ??
 				'https://epnhpyyerjkkyxartywd.supabase.co/storage/v1/object/public/boss-images/ds1/asylumdemon.webp',
-			name: boss.Bosses.bossName,
-			deaths: boss.BossDeathsInRun?.deathCount ?? 0,
-			deathDate: boss.BossDeathsInRun?.deathDate ?? null,
-			deathDateString: boss.BossDeathsInRun?.deathDate
-				? getDateString(boss.BossDeathsInRun?.deathDate)
-				: null,
-			deathTimeSince: boss.BossDeathsInRun?.deathDate
-				? getTimeSinceEpoch(boss.BossDeathsInRun?.deathDate)
-				: null,
+			name: boss.bossName,
+			deaths: death?.deathCount ?? 0,
+			deathDate: death?.deathDate ?? null,
+			deathDateString: death?.deathDate ? getDateString(death?.deathDate) : null,
+			deathTimeSince: death?.deathDate ? getTimeSinceEpoch(death?.deathDate) : null,
 			killText,
 			killColour
 		};
