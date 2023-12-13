@@ -56,8 +56,156 @@ export const getTimeSinceEpoch = (epochTime: number): { unit: string; count: num
 	}
 };
 
+/**
+ * Returns a string representation of the given epoch time.
+ * @param epochTime The epoch time to format.
+ * @returns A string representation of the given epoch time.
+ */
 export const getExperienceTitle = (experience: number): string => {
 	const experienceTitles = ['Beginner', 'Novice', 'Intermediate', 'Expert'];
 
 	return experienceTitles[experience];
+};
+
+/**
+ * Returns a string representation of the given epoch timestamp.
+ * @param epochTimestamp The epoch timestamp to format.
+ * @returns A string representation of the given epoch timestamp.
+ */
+export const getDateString = (epochTimestamp: number) => {
+	const date = new Date(epochTimestamp);
+
+	// Extract individual components (year, month, day)
+	const year = date.getFullYear();
+	const month = date.toLocaleString('default', { month: 'long' });
+	const day = date.getDate();
+
+	// Add the ordinal suffix to the day
+	const addOrdinalSuffix = (day: number) => {
+		if (day >= 11 && day <= 13) {
+			return day + 'th';
+		}
+		switch (day % 10) {
+			case 1:
+				return day + 'st';
+			case 2:
+				return day + 'nd';
+			case 3:
+				return day + 'rd';
+			default:
+				return day + 'th';
+		}
+	};
+	const dayWithSuffix = addOrdinalSuffix(day);
+
+	// Format the date as a string
+	const formattedDate = `${dayWithSuffix} ${month} ${year}`;
+
+	return formattedDate;
+};
+
+/**
+ * Returns the boss with the soonest death date.
+ * @param deathRecords An array of death records.
+ * @param bossArray An array of boss objects.
+ * @returns The boss object with the soonest death date.
+ */
+export const getBossWithSoonestDeath = (deathArray) => {
+	// Ensure the array is non-empty
+	if (deathArray.length === 0) {
+		return null; // Array is empty
+	}
+
+	// Filter out objects with null deathDate
+	const validObjects = deathArray.filter((obj) => obj.deathDate !== null);
+
+	// If all deathDates are null, return null
+	if (validObjects.length === 0) {
+		return null;
+	}
+
+	// Find the object with the soonest deathDate
+	const soonestDeathObject = validObjects.reduce((minObj, currentObj) => {
+		return currentObj.deathDate < minObj.deathDate ? currentObj : minObj;
+	}, validObjects[0]);
+
+	return soonestDeathObject;
+};
+
+/**
+ * Returns data for the boss kill text and colour.
+ * @param bossId The ID of the boss.
+ * @returns An object containing the boss kill text and colour.
+ */
+export const getKillButtonInfo = (bossId: number) => {
+	// Demon's Souls
+	if (bossId <= 16) {
+		return { killText: 'Demon Vanquished', killColour: '#FFFFFF' };
+	}
+	// Dark Souls
+	if (bossId <= 41) {
+		return { killText: 'Victory Achieved', killColour: '#f0a91b' };
+	}
+	// Dark Souls 2
+	if (bossId <= 83) {
+		const soulBearers = [46, 61, 53, 57];
+		if (soulBearers.includes(bossId)) {
+			return { killText: 'Great Soul Embraced', killColour: '#f0a91b' };
+		}
+		return { killText: 'Victory Achieved', killColour: '#f0a91b' };
+	}
+	// Dark Souls 3
+	if (bossId <= 107) {
+		const lordsOfCinder = [88, 90, 93, 98, 101];
+		if (lordsOfCinder.includes(bossId)) {
+			return { killText: 'Lord of Cinder Fallen', killColour: '#F05E1B' };
+		}
+		return { killText: 'Heir of Fire Destroyed', killColour: '#f0a91b' };
+	}
+	// Bloodborne
+	if (bossId <= 129) {
+		const nightmares = [121, 123, 129];
+		if (nightmares.includes(bossId)) {
+			return { killText: 'Nightmare Slain', killColour: '#A5372C' };
+		}
+		return { killText: 'Prey Slaughtered', killColour: '#81A389' };
+	}
+	// Sekiro
+	if (bossId <= 146) {
+		// Immortalilty Severed
+		const immortalBosses = [139, 143, 146];
+		if (immortalBosses.includes(bossId)) {
+			return { killText: 'Immortality Severed', killColour: '#FFFFFF' };
+		}
+		// Divine Dragon
+		if (bossId == 140) {
+			return { killText: 'Gracious Gift of Tears', killColour: '#F8CFD2' };
+		}
+		return { killText: 'Shinobi Execution', killColour: '#FFFFFF' };
+	}
+	// Elden Ring
+	if (bossId <= 177) {
+		const legends = [150, 174, 173, 160, 157, 176, 168, 172];
+		const demigods = [148, 153, 165, 162, 166, 170];
+		// Radagon/Elden Beast
+		if (bossId == 177) {
+			return { killText: 'God Slain', killColour: '#F6CD39' };
+		}
+		if (legends.includes(bossId)) {
+			return { killText: 'Legend Felled', killColour: '#F6CD39' };
+		}
+		if (demigods.includes(bossId)) {
+			return { killText: 'Demigod Felled', killColour: '#F6CD39' };
+		}
+		return { killText: 'Great Enemy Felled', killColour: '#F6CD39' };
+	} else return { killText: 'Boss Killed', killColour: '#FFFFFF' };
+};
+
+/**
+ * Returns a truncated version of the given string.
+ * @param str The string to truncate.
+ * @returns The truncated string.
+ */
+export const truncateString = (str) => {
+	return str.length > 20 ? `${str.slice(0, 20)}...` : str;
 };

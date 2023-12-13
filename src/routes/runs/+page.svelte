@@ -8,6 +8,7 @@
 	export let data;
 
 	const { games, userData, runs } = data;
+	console.log(games, userData, runs);
 
 	let nameValue;
 	let experienceValue = 0;

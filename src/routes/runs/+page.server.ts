@@ -1,6 +1,12 @@
 import { db } from '$lib/server/database';
-import { bossDeathsInRunTable, gamesTable, runsTable, userTable } from '$lib/server/schema';
-import { eq } from 'drizzle-orm';
+import {
+	bossDeathsInRunTable,
+	gamesTable,
+	runsTable,
+	userTable,
+	bossesTable
+} from '$lib/server/schema';
+import { eq, desc, sql } from 'drizzle-orm';
 
 export const load = async ({ fetch, data }) => {
 	const games = await db.select().from(gamesTable);
@@ -9,7 +15,7 @@ export const load = async ({ fetch, data }) => {
 		.from(runsTable)
 		.innerJoin(gamesTable, eq(gamesTable.gameId, runsTable.gameId))
 		.innerJoin(userTable, eq(userTable.id, runsTable.runUser))
-		.leftJoin(bossDeathsInRunTable, eq(bossDeathsInRunTable.runId, runsTable.runId));
+		.all();
 
 	const runs = runsData.map((run) => {
 		return {
@@ -22,10 +28,8 @@ export const load = async ({ fetch, data }) => {
 			runName: run.Runs.runName,
 			runStartDate: run.Runs.runStartDate,
 			runEndDate: run.Runs.runEndDate,
-			experience: run.Runs.experience,
-			bossDeaths: run.BossDeathsInRun
+			experience: run.Runs.experience
 		};
 	});
-
-	return { games, runs };
+	return { games, runs, runsData };
 };

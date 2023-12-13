@@ -8,6 +8,7 @@
 	import Flame from '$lib/components/Flame.svelte';
 	import LogoutIcon from 'virtual:icons/iconoir/log-out';
 	import LoginIcon from 'virtual:icons/iconoir/log-in';
+	import { fade } from 'svelte/transition';
 
 	export let data;
 
@@ -65,7 +66,7 @@
 								<button
 									on:click={() => goto(navItem.link)}
 									id="link"
-									class="text-3xl"
+									class="text-3xl opacity-50"
 									data-text={navItem.name}>{navItem.name}</button
 								>
 							{/if}
@@ -96,36 +97,18 @@
 			</div>
 		</div>
 	{/if}
-	<div class="max-w-screen-lg mx-auto">
-		<slot />
-	</div>
+	{#key data.url}
+		<div
+			class="max-w-screen-lg mx-auto"
+			out:fade={{ duration: 100 }}
+			in:fade={{ delay: 120, duration: 250 }}
+		>
+			<slot />
+		</div>
+	{/key}
 </div>
 
 <style>
-	#link {
-		display: inline-block;
-		vertical-align: top;
-		position: relative;
-		line-height: 36px;
-		cursor: pointer;
-		color: rgb(240, 94, 27);
-	}
-
-	#link:before {
-		transition: height 0.5s ease-in-out;
-		content: attr(data-text);
-		position: absolute;
-		overflow: hidden;
-		color: #78716c;
-		height: 36px;
-		left: 0;
-		top: 0;
-	}
-
-	#link:hover:before {
-		height: 0;
-	}
-
 	#page {
 		background-color: hsla(106, 0%, 9%, 1);
 		background-image: radial-gradient(at 20% 89%, hsla(19, 52%, 20%, 0.43) 0px, transparent 50%),

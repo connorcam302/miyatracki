@@ -7,7 +7,8 @@ export const bossesTable = sqliteTable('Bosses', {
 	bossDlc: numeric('boss_dlc').references(() => dlcTable.dlcId),
 	bossGame: integer('boss_game')
 		.notNull()
-		.references(() => gamesTable.gameId)
+		.references(() => gamesTable.gameId),
+	bossImage: text('boss_image')
 });
 
 export const dlcTable = sqliteTable('DLC', {
@@ -41,7 +42,7 @@ export const bossDeathsInRunTable = sqliteTable('BossDeathsInRun', {
 		.notNull()
 		.references(() => bossesTable.bossId),
 	deathCount: integer('death_count').notNull(),
-	deathDate: numeric('death_date')
+	deathDate: integer('death_date')
 });
 
 export const runsTable = sqliteTable('Runs', {
