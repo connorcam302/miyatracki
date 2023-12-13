@@ -73,11 +73,15 @@
 										{boss.bossName}
 									</div>
 								</div>
-								<img
-									class="w-52 h-52 mx-auto"
-									src="https://epnhpyyerjkkyxartywd.supabase.co/storage/v1/object/public/boss-images/ds1/artorias.png"
-									alt="boss"
-								/>
+								{#if boss.bossImage}
+									<img class="w-52 h-52 mx-auto" src={boss.bossImage} alt="boss" />
+								{:else}
+									<img
+										class="w-52 h-52 mx-auto"
+										src="https://epnhpyyerjkkyxartywd.supabase.co/storage/v1/object/public/boss-images/ds1/artorias.png"
+										alt="boss"
+									/>
+								{/if}
 							</div>
 						</ChildBox>
 					{/each}

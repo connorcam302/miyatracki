@@ -7,7 +7,8 @@ export const bossesTable = sqliteTable('Bosses', {
 	bossDlc: numeric('boss_dlc').references(() => dlcTable.dlcId),
 	bossGame: integer('boss_game')
 		.notNull()
-		.references(() => gamesTable.gameId)
+		.references(() => gamesTable.gameId),
+	bossImage: text('boss_image')
 });
 
 export const dlcTable = sqliteTable('DLC', {

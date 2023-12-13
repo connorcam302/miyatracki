@@ -276,11 +276,7 @@
 					</div>
 				</div>
 				<div class="flex flex-col gap-2 w-80">
-					<img
-						alt="profile"
-						class="w-48 h-48 mx-auto mt-4"
-						src="https://epnhpyyerjkkyxartywd.supabase.co/storage/v1/object/public/boss-images/ds1/artorias.png"
-					/>
+					<img alt="profile" class="w-48 h-48 mx-auto mt-4" src={currentBoss.bossImage} />
 					<div class="h-16 flex justify-center items-center">
 						<div class="font-display text-center text-2xl">
 							{currentBoss.name}

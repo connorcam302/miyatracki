@@ -48,6 +48,9 @@ export const load = async ({ fetch, data, params }) => {
 
 		return {
 			id: boss.Bosses.bossId,
+			bossImage:
+				boss.Bosses.bossImage ??
+				'https://epnhpyyerjkkyxartywd.supabase.co/storage/v1/object/public/boss-images/ds1/asylumdemon.webp',
 			name: boss.Bosses.bossName,
 			deaths: boss.BossDeathsInRun?.deathCount ?? 0,
 			deathDate: boss.BossDeathsInRun?.deathDate ?? null,
