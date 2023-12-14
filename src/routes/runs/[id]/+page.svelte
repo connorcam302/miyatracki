@@ -13,7 +13,8 @@
 	import IconoirCircle from 'virtual:icons/iconoir/circle';
 	import IconoirCheckCircle from 'virtual:icons/iconoir/check-circle';
 	import IconoirMoreHorizCircle from '~icons/iconoir/more-horiz-circle';
-	import { fade } from 'svelte/transition';
+	import { fade, slide, fly } from 'svelte/transition';
+	import { quintOut } from 'svelte/easing';
 	import { getTimeSinceEpoch, getDateString, truncateString } from '$lib/functions';
 	import { page } from '$app/stores';
 	import { goto } from '$app/navigation';
@@ -51,7 +52,23 @@
 
 	const auth = setAuth(user.id, userData?.id ?? null);
 
+	let direction = '1';
+	let axis = 'y';
+	$: innerWidth = 0;
+	$: innerHeight = 0;
+
 	const setBoss = (boss) => {
+		if (boss.id > currentBoss.id) {
+			direction = '1';
+		} else {
+			direction = '-1';
+		}
+		if (innerWidth > 667) {
+			axis = 'y';
+		} else {
+			axis = 'x';
+		}
+
 		currentBoss = boss;
 		$page.url.searchParams.set('boss', boss.id);
 		goto(`?${$page.url.searchParams.toString()}`);
@@ -190,8 +207,10 @@
 	};
 </script>
 
-<div class="flex flex-wrap">
-	<div class="flex">
+<svelte:window bind:innerWidth bind:innerHeight />
+
+<div class="flex flex-wrap justify-center items-center">
+	<div class="flex flex-none">
 		<ParentBox>
 			<div class="pr-2">
 				<div>
@@ -232,105 +251,111 @@
 			</div>
 		</ParentBox>
 	</div>
-	<div class="">
-		<div class="flex flex-wrap justify-center h-full w-full">
-			<div class="relative rounded-[48px] bg-stone-700 py-5 px-5 m-2 bg-opacity-[.30] w-max">
-				{#if auth}
-					<div
-						role="table"
-						class="flex absolute right-0 mr-8 mt-3"
-						on:mouseleave={() => closeOptions()}
-					>
-						{#if optionsVisible}
-							<div
-								transition:fade={{ duration: 100 }}
-								class="ml-5 flex flex-col gap-0 text-stone-800 bg-stone-200 hover:bg-stone-400 rounded-xl drop-shadow-md"
-							>
-								{#if currentBoss.deathDate}
-									<button
-										class="bg-stone-200 px-4 pt-1 rounded-t-xl border-solid border-2 border-b-0 border-stone-800 hover:bg-stone-400 transition-all"
-										on:click={() => toggleReviveModal()}>Revive Boss</button
-									>
-								{:else}
-									<div
-										class="bg-stone-600 px-4 pt-1 rounded-t-xl border-solid border-2 border-b-0 border-stone-800 transition-all"
-									>
-										Revive Boss
-									</div>
-								{/if}
+	<div class="w-96 h-[524px] relative flex justify-center">
+		{#key currentBoss.id}
+			<div class="flex justify-center absolute">
+				<div
+					in:fly={{ delay: 150, duration: 1000, easing: quintOut, [axis]: direction * 150 }}
+					out:fly={{ duration: 1000, easing: quintOut, [axis]: direction * -1 * 150 }}
+					class="relative rounded-[48px] bg-stone-700 py-5 px-5 m-2 bg-opacity-[.30] w-max"
+				>
+					{#if auth}
+						<div
+							role="table"
+							class="flex absolute right-0 mr-8 mt-3"
+							on:mouseleave={() => closeOptions()}
+						>
+							{#if optionsVisible}
 								<div
-									class="flex items-center justify-center border-solid border-2 border-y-0 border-stone-800"
+									transition:fade={{ duration: 100 }}
+									class="ml-5 flex flex-col gap-0 text-stone-800 bg-stone-200 hover:bg-stone-400 rounded-xl drop-shadow-md"
 								>
-									<div class=" h-[1px] w-11/12 bg-stone-800" />
-								</div>
-								<button
-									class="bg-stone-200 px-4 pb-1 rounded-b-xl border-solid border-2 border-t-0 border-stone-800 hover:bg-stone-400 transition-all"
-									on:click={() => toggleSetDeathsModal()}
-								>
-									Set Deaths
-								</button>
-							</div>
-						{/if}
-						<div class="text-2xl">
-							<button on:click={() => toggleOptions()}>
-								<IconoirMoreHorizCircle />
-							</button>
-						</div>
-					</div>
-				{/if}
-				<div class="flex flex-col gap-2 w-80">
-					<img alt="profile" class="w-48 h-48 mx-auto mt-4" src={currentBoss.bossImage} />
-					<div class="h-16 flex justify-center items-center">
-						<div class="font-display text-center text-2xl">
-							{currentBoss.name}
-						</div>
-					</div>
-					<div class="text-5xl flex items-center justify-center align-middle gap-2">
-						<div class="flex-1 text-right font-title">{currentBoss.deaths}</div>
-						<div class="text-3xl"><IconoirXmark /></div>
-						<div class="flex-1"><MaterialSymbolsHeartBroken /></div>
-					</div>
-					{#key currentBoss}
-						<div class="flex align-middle items-center justify-center">
-							{#if !currentBoss.deathDate && auth}
-								<div>
-									<button
-										class="my-auto text-xs font-bold p-2 px-4 rounded-full text-stone-200 bg-red-800"
-										on:click={() => removeDeath(currentBoss)}>Remove Death</button
-									>
-								</div>
-								<div class="flex-grow" />
-								<div>
-									<button
-										class="text-xl font-bold p-4 px-6 rounded-full text-black bg-stone-200"
-										on:click={() => addDeath(currentBoss)}>Add Death</button
-									>
-								</div>
-							{:else}
-								<div class="text-3xl h-[116px] text-center flex flex-col justify-center">
 									{#if currentBoss.deathDate}
-										<div class="font-title flex-col" style="color: {currentBoss.killColour}">
-											{currentBoss.killText.toUpperCase()}
-										</div>
-										<div class="font-display opacity-40 text-sm">
-											{currentBoss.deathDateString}
+										<button
+											class="bg-stone-200 px-4 pt-1 rounded-t-xl border-solid border-2 border-b-0 border-stone-800 hover:bg-stone-400 transition-all"
+											on:click={() => toggleReviveModal()}>Revive Boss</button
+										>
+									{:else}
+										<div
+											class="bg-stone-600 px-4 pt-1 rounded-t-xl border-solid border-2 border-b-0 border-stone-800 transition-all"
+										>
+											Revive Boss
 										</div>
 									{/if}
+									<div
+										class="flex items-center justify-center border-solid border-2 border-y-0 border-stone-800"
+									>
+										<div class=" h-[1px] w-11/12 bg-stone-800" />
+									</div>
+									<button
+										class="bg-stone-200 px-4 pb-1 rounded-b-xl border-solid border-2 border-t-0 border-stone-800 hover:bg-stone-400 transition-all"
+										on:click={() => toggleSetDeathsModal()}
+									>
+										Set Deaths
+									</button>
 								</div>
 							{/if}
+							<div class="text-2xl">
+								<button on:click={() => toggleOptions()}>
+									<IconoirMoreHorizCircle />
+								</button>
+							</div>
 						</div>
-						{#if !currentBoss.deathDate && auth}
-							<button
-								class={'bg-black text-xl mt-2 -mx-5 -mb-5 p-4 rounded-b-[40px] font-bold'}
-								on:click={() => killBoss(currentBoss)}>Boss Killed</button
-							>
-						{/if}
-					{/key}
+					{/if}
+					<div class="flex flex-col gap-2 w-80">
+						<img alt="profile" class="w-48 h-48 mx-auto mt-4" src={currentBoss.bossImage} />
+						<div class="h-16 flex justify-center items-center">
+							<div class="font-display text-center text-2xl">
+								{currentBoss.name}
+							</div>
+						</div>
+						<div class="text-5xl flex items-center justify-center align-middle gap-2">
+							<div class="flex-1 text-right font-title">{currentBoss.deaths}</div>
+							<div class="text-3xl"><IconoirXmark /></div>
+							<div class="flex-1"><MaterialSymbolsHeartBroken /></div>
+						</div>
+						{#key currentBoss}
+							<div class="flex align-middle items-center justify-center">
+								{#if !currentBoss.deathDate && auth}
+									<div>
+										<button
+											class="my-auto text-xs font-bold p-2 px-4 rounded-full text-stone-200 bg-red-800"
+											on:click={() => removeDeath(currentBoss)}>Remove Death</button
+										>
+									</div>
+									<div class="flex-grow" />
+									<div>
+										<button
+											class="text-xl font-bold p-4 px-6 rounded-full text-black bg-stone-200"
+											on:click={() => addDeath(currentBoss)}>Add Death</button
+										>
+									</div>
+								{:else}
+									<div class="text-3xl h-[116px] text-center flex flex-col justify-center">
+										{#if currentBoss.deathDate}
+											<div class="font-title flex-col" style="color: {currentBoss.killColour}">
+												{currentBoss.killText.toUpperCase()}
+											</div>
+											<div class="font-display opacity-40 text-sm">
+												{currentBoss.deathDateString}
+											</div>
+										{/if}
+									</div>
+								{/if}
+							</div>
+							{#if !currentBoss.deathDate && auth}
+								<button
+									class={'bg-black text-xl mt-2 -mx-5 -mb-5 p-4 rounded-b-[40px] font-bold'}
+									on:click={() => killBoss(currentBoss)}>Boss Killed</button
+								>
+							{/if}
+						{/key}
+					</div>
 				</div>
 			</div>
-		</div>
+		{/key}
 	</div>
-	<div class="">
+	<div class="flex-none">
 		<ParentBox>
 			<div class="flex flex-col">
 				<img src={user.profilePicture} class="w-56 h-56 rounded-full p-10" alt="profile" />
