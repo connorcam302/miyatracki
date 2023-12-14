@@ -91,7 +91,7 @@
 				</div>
 				{#if navBar === 'mobile'}
 					<div class="flex-1 flex justify-end items-center h-12">
-						<div class="absolute z-10">
+						<div class="absolute z-20">
 							<button
 								class="text-3xl p-2"
 								on:click={toggleVisible}
