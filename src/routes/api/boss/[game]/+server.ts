@@ -1,5 +1,3 @@
-//create a sveltekit endpoint\
-
 import { customResponse } from '$lib/CustomResponse';
 import { db } from '$lib/server/database';
 import { bossesTable } from '$lib/server/schema';

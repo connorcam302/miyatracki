@@ -61,10 +61,11 @@ export const getTimeSinceEpoch = (epochTime: number): { unit: string; count: num
  * @param epochTime The epoch time to format.
  * @returns A string representation of the given epoch time.
  */
-export const getExperienceTitle = (experience: number): string => {
-	const experienceTitles = ['Beginner', 'Novice', 'Intermediate', 'Expert'];
+export const getExperienceTitle = (experience) => {
+	const titles = ['Beginner', 'Novice', 'Intermediate', 'Expert'];
+	const colours = ['#22c55e', '#84CC16', '#EA580C', '#EF4444'];
 
-	return experienceTitles[experience];
+	return { title: titles[experience], colour: colours[experience] };
 };
 
 /**
@@ -206,6 +207,6 @@ export const getKillButtonInfo = (bossId: number) => {
  * @param str The string to truncate.
  * @returns The truncated string.
  */
-export const truncateString = (str) => {
-	return str.length > 20 ? `${str.slice(0, 20)}...` : str;
+export const truncateString = (str, maxlength = 20) => {
+	return str.length > maxlength ? `${str.slice(0, maxlength)}...` : str;
 };

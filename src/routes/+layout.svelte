@@ -8,6 +8,9 @@
 	import Flame from '$lib/components/Flame.svelte';
 	import LogoutIcon from 'virtual:icons/iconoir/log-out';
 	import LoginIcon from 'virtual:icons/iconoir/log-in';
+	import BiGithub from 'virtual:icons/bi/github';
+	import BiTwitterX from 'virtual:icons/bi/twitter-x';
+	import BiLinkedin from 'virtual:icons/bi/linkedin';
 	import { fade } from 'svelte/transition';
 
 	export let data;
@@ -37,9 +40,11 @@
 			link: '/boss'
 		}
 	];
+
+	$: url = $page.url.pathname;
 </script>
 
-<div class="min-h-screen">
+<div class="min-h-screen flex flex-col">
 	{#if $page.url.pathname !== '/auth'}
 		<div class="px-2 py-5 text-lg text-stone-200">
 			<div class="min-w-screen flex mx-auto">
@@ -56,7 +61,7 @@
 				<div class="flex-1 flex justify-center items-center">
 					<div class="flex gap-10">
 						{#each navItems as navItem}
-							{#if navItem.link === $page.url.pathname}
+							{#if url.includes(navItem.link)}
 								<button
 									on:click={() => goto(navItem.link)}
 									class="text-3xl font-white"
@@ -99,13 +104,27 @@
 	{/if}
 	{#key data.url}
 		<div
-			class="max-w-screen-lg mx-auto"
-			out:fade={{ duration: 100 }}
+			class="grow max-w-screen-lg mx-auto flex flex-col justify-center"
 			in:fade={{ delay: 120, duration: 250 }}
 		>
 			<slot />
 		</div>
 	{/key}
+	<div class="flex flex-col gap-2 my-4">
+		<div class="flex justify-center gap-4 text-xl">
+			<a
+				href="https://www.linkedin.com/in/connor-campbell-600265175/"
+				class="hover:text-ember transition-all"><BiLinkedin /></a
+			>
+			<a href="https://twitter.com/TheColfox" class="hover:text-ember transition-all"
+				><BiTwitterX /></a
+			>
+			<a href="https://github.com/connorcam302" class="hover:text-ember transition-all"
+				><BiGithub /></a
+			>
+		</div>
+		<div class="flex justify-center text-xs">miyatracki | Connor Campbell</div>
+	</div>
 </div>
 
 <style>
