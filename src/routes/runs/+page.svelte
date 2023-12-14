@@ -9,13 +9,12 @@
 	import { fly, fade } from 'svelte/transition';
 	import { uniqueNamesGenerator, adjectives, colors, animals } from 'unique-names-generator';
 	import { truncateString } from '$lib/functions';
-	import ParentBox from '$lib/components/ParentBox.svelte';
-	import RunMini from '$lib/components/RunMini.svelte';
 	import { goto } from '$app/navigation';
 
 	export let data;
 
-	const { games, userData, runs } = data;
+	const { games, userData } = data;
+	console.log(games);
 
 	let nameValue;
 	let experienceValue = 0;
@@ -31,8 +30,7 @@
 	const regenerateName = () => {
 		nameValue = uniqueNamesGenerator({
 			dictionaries: [adjectives, colors, animals],
-			separator: ' ',
-			style: 'capital'
+			separator: '-'
 		});
 	};
 
@@ -83,8 +81,7 @@
 			if (i === 0) {
 				txt = uniqueNamesGenerator({
 					dictionaries: [adjectives, colors, animals],
-					separator: ' ',
-					style: 'capital'
+					separator: '-'
 				});
 
 				direction = 1;
@@ -189,13 +186,13 @@
 			</div>
 		{/key}
 	</div>
-	{#if returnedRuns}
+	{#if returnedRuns !== null}
 		<div class="flex flex-wrap justify-center">
 			{#each returnedRuns as { id, username, game, name, profilePicture, experienceTitle, experienceColour }, i}
 				<div key={i}>
 					<button
 						on:click={() => goto(`/runs/${id}`)}
-						class="rounded-full bg-stone-700 py-3 px-3 pl-5 m-2 bg-opacity-[.30] w-[340px]"
+						class="rounded-full bg-stone-700 py-3 px-3 pl-5 m-2 bg-opacity-[.30] w-[375px]"
 					>
 						<div class="flex gap-2 pl-4">
 							<div class="flex flex-col text-sm">
@@ -232,7 +229,7 @@
 	<div
 		transition:fade={{ duration: 200 }}
 		id="backdrop"
-		class="h-screen fixed top-0 w-screen cursor-default"
+		class="h-screen fixed z-30 top-0 w-screen cursor-default"
 		on:click|self={toggleVisible}
 		on:keypress={(e) => e.key === 'Escape' && toggleVisible()}
 		tabindex="0"
@@ -240,7 +237,7 @@
 	>
 		<div
 			transition:fly={{ x: 1000, duration: 1000 }}
-			class="absolute opacity-100 inset-y-0 right-0 w-72 bg-stone-200 rounded-l-xl py-8 px-4 text-black"
+			class="absolute z-30 opacity-100 inset-y-0 right-0 w-72 bg-stone-200 rounded-l-xl py-8 px-4 text-black"
 		>
 			<form class="flex flex-col gap-3" on:submit|preventDefault={handleSubmit}>
 				<div class="flex flex-col">
