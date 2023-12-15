@@ -48,17 +48,17 @@
 	$: innerWidth = 0;
 	$: innerHeight = 0;
 	$: navBar = 'desktop';
-	const handleNavbar = (innerWidth, innerHeight) => {
+
+	const handleNavbar = (innerWidth) => {
 		if (innerWidth < 1200) {
 			navBar = 'mobile';
 		} else {
 			navBar = 'desktop';
 		}
 	};
-	$: handleNavbar(innerWidth, innerHeight);
+	$: handleNavbar(innerWidth);
 
-	let visible = true;
-	$: titleColour = 'black';
+	let visible = false;
 	function toggleVisible() {
 		visible = !visible;
 	}
