@@ -16,6 +16,8 @@
 	import IconoirRunning from 'virtual:icons/iconoir/running';
 	import IconoirBonfire from 'virtual:icons/iconoir/bonfire';
 	import { fade, fly } from 'svelte/transition';
+	import { setContext } from 'svelte';
+	import { writable } from 'svelte/store';
 
 	export let data;
 
@@ -49,18 +51,25 @@
 
 	$: innerWidth = 0;
 	$: innerHeight = 0;
-	$: navBar = 'desktop';
+	$: viewport = 'desktop';
 
-	const handleNavbar = (innerWidth) => {
-		if (innerWidth < 1200) {
-			navBar = 'mobile';
+	const handleViewport = (innerWidth) => {
+		if (innerWidth > 1200) {
+			viewport = 'desktop';
+		} else if (innerWidth > 667) {
+			viewport = 'tablet';
 		} else {
-			navBar = 'desktop';
+			viewport = 'mobile';
 		}
 	};
-	$: handleNavbar(innerWidth);
+	$: handleViewport(innerWidth);
 
-	let visible = true;
+	const viewportStore = writable();
+	$: viewportStore.set(viewport);
+
+	setContext('viewport', viewportStore);
+
+	let visible = false;
 	function toggleVisible() {
 		visible = !visible;
 	}
@@ -91,7 +100,7 @@
 						{/key}
 					</div>
 				</div>
-				{#if navBar === 'mobile'}
+				{#if viewport === 'tablet' || viewport === 'mobile'}
 					<div class="flex-1 flex justify-end items-center h-12">
 						<div class="absolute z-20">
 							<button

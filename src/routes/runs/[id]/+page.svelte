@@ -13,14 +13,15 @@
 	import IconoirCircle from 'virtual:icons/iconoir/circle';
 	import IconoirCheckCircle from 'virtual:icons/iconoir/check-circle';
 	import IconoirMoreHorizCircle from '~icons/iconoir/more-horiz-circle';
-	import { fade, slide, fly } from 'svelte/transition';
+	import { fade, fly } from 'svelte/transition';
 	import { quintOut } from 'svelte/easing';
 	import { getTimeSinceEpoch, getDateString, truncateString } from '$lib/functions';
 	import { page } from '$app/stores';
 	import { goto } from '$app/navigation';
+	import { getContext } from 'svelte';
 
 	const { run, bosses, user, userData } = data;
-	console.log(bosses);
+	$: viewport = getContext('viewport');
 	let bossList = bosses;
 	let urlBoss = Number($page.url.searchParams.get('boss'));
 
@@ -35,7 +36,7 @@
 		}
 	}
 
-	let searchBoss = null;
+	let searchBoss = '';
 	const searchBossesByName = (allBosses, searchString) => {
 		const lowerSearchString = searchString.toLowerCase();
 
@@ -53,20 +54,12 @@
 	const auth = setAuth(user.id, userData?.id ?? null);
 
 	let direction = '1';
-	let axis = 'y';
-	$: innerWidth = 0;
-	$: innerHeight = 0;
 
 	const setBoss = (boss) => {
 		if (boss.id > currentBoss.id) {
 			direction = '1';
 		} else {
 			direction = '-1';
-		}
-		if (innerWidth > 667) {
-			axis = 'y';
-		} else {
-			axis = 'x';
 		}
 
 		currentBoss = boss;
@@ -130,14 +123,14 @@
 
 	const getLatestBoss = () => {
 		// Check if all timestamps are null
-		const allTimestampsNull = bossList.every((boss) => boss.deathDate === null);
+		const allTimestampsNull = bosses.every((boss) => boss.deathDate === null);
 
 		if (allTimestampsNull) {
 			return { name: 'No Bosses Killed' };
 		}
 
 		// If not all timestamps are null, find the boss with the latest death date
-		const bossWithLatestDeathDate = bossList.reduce((maxDeathDateBoss, currentBoss) => {
+		const bossWithLatestDeathDate = bosses.reduce((maxDeathDateBoss, currentBoss) => {
 			const maxDeathDate = maxDeathDateBoss ? new Date(maxDeathDateBoss.deathDate) : null;
 			const currentDeathDate = currentBoss.deathDate ? new Date(currentBoss.deathDate) : null;
 
@@ -205,58 +198,119 @@
 			console.log(await response.json());
 		}
 	};
-</script>
 
-<svelte:window bind:innerWidth bind:innerHeight />
+	$: bossListOpen = false;
+	$: console.log(searchBoss.length);
+	$: if (searchBoss.length > 0) {
+		bossListOpen = true;
+	} else {
+		bossListOpen = false;
+	}
+</script>
 
 <div class="flex flex-wrap justify-center items-center">
 	<div class="flex flex-none">
 		<ParentBox>
-			<div class="pr-2">
-				<div>
-					<div class="bg-stone-700 flex gap-2 items-center rounded-xl px-2 my-2">
-						<IconoirSearch />
-						<input
-							type="text"
-							placeholder="Seach bosses..."
-							bind:value={searchBoss}
-							on:input={() => (bossList = searchBossesByName(bosses, searchBoss))}
-							class="bg-stone-700 w-full pr-2"
-						/>
+			{#if $viewport === 'mobile'}
+				<div class="flex flex-col transition-all">
+					<div class="w-80 flex items-center gap-2">
+						<div class="bg-stone-700 flex gap-2 items-center rounded-xl px-2 my-2 grow">
+							<IconoirSearch />
+							<input
+								type="text"
+								placeholder="Seach bosses..."
+								bind:value={searchBoss}
+								on:input={() => (bossList = searchBossesByName(bosses, searchBoss))}
+								class="bg-stone-700 w-full pr-2"
+							/>
+						</div>
+						<button
+							class="bg-stone-200 text-black rounded-full px-2 text-xl"
+							on:click={() => (searchBoss = '')}><IconoirXmark /></button
+						>
 					</div>
-					<div class="overflow-auto h-[420px] pb-8 w-72 flex flex-col gap-2" id="list">
-						{#if bossList.length === 0}
-							<div>No bosses found</div>
-						{/if}
-						{#each bossList as boss}
-							<div>
-								<button
-									class="w-full text-left font-display leading-5 flex gap-1 align-top items-top"
-									on:click={() => setBoss(boss)}
-									>{#if boss.deathDate}
-										<div>
-											<IconoirCheckCircle />
-										</div>
-									{:else}
-										<div>
-											<IconoirCircle />
-										</div>
-									{/if}
-									{boss.name}
-								</button>
-							</div>
-						{/each}
+					{#if bossListOpen}
+						<div class="overflow-auto h-[420px] pb-8 w-80 flex flex-col gap-2" id="list">
+							{#if bossList.length === 0}
+								<div>No bosses found</div>
+							{/if}
+							{#each bossList as boss}
+								<div>
+									<button
+										class="w-full text-left font-display leading-5 flex gap-1 align-top items-top"
+										on:click={() => setBoss(boss)}
+										>{#if boss.deathDate}
+											<div>
+												<IconoirCheckCircle />
+											</div>
+										{:else}
+											<div>
+												<IconoirCircle />
+											</div>
+										{/if}
+										{boss.name}
+									</button>
+								</div>
+							{/each}
+						</div>
+					{/if}
+				</div>
+			{:else}
+				<div class="pr-2">
+					<div>
+						<div class="bg-stone-700 flex gap-2 items-center rounded-xl px-2 my-2">
+							<IconoirSearch />
+							<input
+								type="text"
+								placeholder="Seach bosses..."
+								bind:value={searchBoss}
+								on:input={() => (bossList = searchBossesByName(bosses, searchBoss))}
+								class="bg-stone-700 w-full pr-2"
+							/>
+						</div>
+						<div class="overflow-auto h-[420px] pb-8 w-72 flex flex-col gap-2" id="list">
+							{#if bossList.length === 0}
+								<div>No bosses found</div>
+							{/if}
+							{#each bossList as boss}
+								<div>
+									<button
+										class="w-full text-left font-display leading-5 flex gap-1 align-top items-top"
+										on:click={() => setBoss(boss)}
+										>{#if boss.deathDate}
+											<div>
+												<IconoirCheckCircle />
+											</div>
+										{:else}
+											<div>
+												<IconoirCircle />
+											</div>
+										{/if}
+										{boss.name}
+									</button>
+								</div>
+							{/each}
+						</div>
 					</div>
 				</div>
-			</div>
+			{/if}
 		</ParentBox>
 	</div>
 	<div class="w-96 h-[524px] relative flex justify-center">
 		{#key currentBoss.id}
 			<div class="flex justify-center absolute">
 				<div
-					in:fly={{ delay: 150, duration: 1000, easing: quintOut, [axis]: direction * 150 }}
-					out:fly={{ duration: 1000, easing: quintOut, [axis]: direction * -1 * 150 }}
+					in:fly={{
+						delay: 150,
+						duration: 1000,
+						easing: quintOut,
+						[$viewport == 'mobile' ? 'x' : 'y']: direction * 150
+					}}
+					out:fly={{
+						duration: 1000,
+						easing: quintOut,
+						[$viewport == 'mobile' ? 'x' : 'y']: direction * -1 * 150
+					}}
 					class="relative rounded-[48px] bg-stone-700 py-5 px-5 m-2 bg-opacity-[.30] w-max"
 				>
 					{#if auth}
