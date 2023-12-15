@@ -13,6 +13,8 @@
 	import BiLinkedin from 'virtual:icons/bi/linkedin';
 	import IconoirMenu from 'virtual:icons/iconoir/menu';
 	import IconoirXmark from 'virtual:icons/iconoir/xmark';
+	import IconoirRunning from 'virtual:icons/iconoir/running';
+	import IconoirBonfire from 'virtual:icons/iconoir/bonfire';
 	import { fade, fly } from 'svelte/transition';
 
 	export let data;
@@ -58,7 +60,7 @@
 	};
 	$: handleNavbar(innerWidth);
 
-	let visible = false;
+	let visible = true;
 	function toggleVisible() {
 		visible = !visible;
 	}
@@ -83,7 +85,7 @@
 						{#key visible}
 							<button
 								class="mr-3 text-4xl font-bold font-display"
-								on:click={() => goto('/')}
+								on:click={() => mobileNavigate('/')}
 								style="color: {!visible ? 'white' : 'black'}">miyatracki</button
 							>
 						{/key}
@@ -190,10 +192,10 @@
 	>
 		<div
 			transition:fly={{ y: -1000, duration: 500 }}
-			class="absolute opacity-100 inset-y-0 top-0 h-64 w-screen bg-stone-200 rounded-b-xl py-8 px-4 text-black"
+			class="absolute opacity-100 inset-y-0 top-0 h-72 w-screen bg-stone-200 rounded-b-xl py-8 px-4 text-black"
 		>
 			<div class="text-3xl w-full mt-8">
-				<div class="flex py-2 mx-2 items-center align-middle">
+				<div class="flex py-4 mx-2 items-center align-middle">
 					{#if session && userData}
 						<div class="flex gap-3 justify-center items-center">
 							<img
@@ -201,7 +203,7 @@
 								class="object-cover h-12 w-12 rounded-full"
 								alt="profile"
 							/>
-							<div class="align-bottom">{userData.displayName}</div>
+							<div class="align-bottom text-2xl">{userData.displayName}</div>
 						</div>
 						<div class="flex-1" />
 						<button on:click={() => supabase.auth.signOut()} class="rounded-full h-12 w-12">
@@ -213,23 +215,40 @@
 							class="flex justify-center items-center rounded-full h-12 w-12"
 							><LoginIcon />
 						</button>
-						<button on:click={() => mobileNavigate('/auth')} class="my-auto">Login</button>
+						<button on:click={() => mobileNavigate('/auth')} class="my-auto text-2xl">Login</button>
 					{/if}
 				</div>
 				<div class="flex flex-col justify-center">
 					<div class="h-[1px] w-11/12 bg-stone-700 mx-auto rounded-full" />
-					{#each navItems as navItem}
-						{#if url.includes(navItem.link)}
-							<button class="text-3xl font-white" data-text={navItem.name}>{navItem.name}</button>
-						{:else}
-							<button
-								on:click={() => mobileNavigate(navItem.link)}
-								class="text-3xl opacity-50"
-								data-text={navItem.name}>{navItem.name}</button
-							>
-						{/if}
-						<div class="h-[1px] w-11/12 bg-stone-700 mx-auto rounded-full" />
-					{/each}
+					<div class="flex flex-col gap-4 pt-4 mx-4">
+						{#each navItems as navItem}
+							{#if url.includes(navItem.link)}
+								<div class="flex gap-2">
+									{#if navItem.name === 'Runs'}
+										<IconoirRunning />
+									{:else if navItem.name === 'Bosses'}
+										<IconoirBonfire />
+									{/if}
+									<button class="text-3xl font-white" data-text={navItem.name}
+										>{navItem.name}</button
+									>
+								</div>
+							{:else}
+								<div class="flex gap-2 opacity-50">
+									{#if navItem.name === 'Runs'}
+										<IconoirRunning />
+									{:else if navItem.name === 'Bosses'}
+										<IconoirBonfire />
+									{/if}
+									<button
+										on:click={() => mobileNavigate(navItem.link)}
+										class="text-3xl"
+										data-text={navItem.name}>{navItem.name}</button
+									>
+								</div>
+							{/if}
+						{/each}
+					</div>
 				</div>
 			</div>
 		</div>
