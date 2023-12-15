@@ -38,7 +38,7 @@
 	};
 </script>
 
-<div>
+<div class="w-screen">
 	<div class="flex flex-wrap justify-center text-stone-200">
 		{#each allGames as game}
 			{#if currentGame.length <= 1 && currentGame[0].id === game.id}

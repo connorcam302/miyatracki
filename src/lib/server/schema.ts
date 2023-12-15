@@ -58,3 +58,16 @@ export const runsTable = sqliteTable('Runs', {
 	experience: integer('experience'),
 	runName: text('run_name').notNull()
 });
+
+export const bossRatingsTable = sqliteTable('BossRatings', {
+	ratingId: integer('rating_id').primaryKey({ autoIncrement: true }).notNull(),
+	userId: integer('user_id')
+		.notNull()
+		.references(() => userTable.id),
+	bossId: integer('boss_id')
+		.notNull()
+		.references(() => bossesTable.bossId),
+	enjoymentRating: integer('enjoyment_rating').notNull(),
+	difficultyRating: integer('difficulty_rating').notNull(),
+	timestamp: text('timestamp')
+});

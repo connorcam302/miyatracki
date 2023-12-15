@@ -8,6 +8,7 @@ export const bosses = sqliteTable("Bosses", {
 	bossOptional: numeric("boss_optional"),
 	bossDlc: numeric("boss_dlc").references(() => dlc.dlcId),
 	bossGame: integer("boss_game").notNull().references(() => games.gameId),
+	bossImage: numeric("boss_image"),
 });
 
 export const dlc = sqliteTable("DLC", {
@@ -30,14 +31,6 @@ export const user = sqliteTable("User", {
 	profilePicture: text("profile_picture"),
 });
 
-export const bossDeathsInRun = sqliteTable("BossDeathsInRun", {
-	deathId: integer("death_id").primaryKey({ autoIncrement: true }).notNull(),
-	runId: integer("run_id").notNull().references(() => runs.runId),
-	bossId: integer("boss_id").notNull().references(() => bosses.bossId),
-	deathCount: integer("death_count").notNull(),
-	deathDate: numeric("death_date"),
-});
-
 export const runs = sqliteTable("Runs", {
 	runId: integer("run_id").primaryKey({ autoIncrement: true }).notNull(),
 	gameId: integer("game_id").notNull().references(() => games.gameId),
@@ -46,4 +39,29 @@ export const runs = sqliteTable("Runs", {
 	runUser: integer("run_user").notNull().references(() => user.id),
 	experience: integer("experience").notNull(),
 	runName: numeric("run_name").notNull(),
+});
+
+export const bossDeathsInRun = sqliteTable("BossDeathsInRun", {
+	deathId: integer("death_id").primaryKey({ autoIncrement: true }).notNull(),
+	runId: integer("run_id").notNull().references(() => runs.runId),
+	bossId: integer("boss_id").notNull().references(() => bosses.bossId),
+	deathCount: integer("death_count").notNull(),
+	deathDate: integer("death_date"),
+});
+
+export const bossesCopy = sqliteTable("BossesCopy", {
+	bossId: integer("boss_id").primaryKey({ autoIncrement: true }).notNull(),
+	bossName: text("boss_name").notNull(),
+	bossOptional: numeric("boss_optional"),
+	bossDlc: numeric("boss_dlc").references(() => dlc.dlcId),
+	bossGame: integer("boss_game").notNull().references(() => games.gameId),
+});
+
+export const bossRatings = sqliteTable("BossRatings", {
+	ratingId: integer("rating_id").primaryKey({ autoIncrement: true }).notNull(),
+	userId: integer("user_id").notNull().references(() => user.id),
+	bossId: integer("boss_id").notNull().references(() => bosses.bossId),
+	enjoymentRating: integer("enjoyment_rating").notNull(),
+	difficultyRating: integer("difficulty_rating").notNull(),
+	timestamp: text("timestamp"),
 });
