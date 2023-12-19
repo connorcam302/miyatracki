@@ -311,7 +311,7 @@
 						easing: quintOut,
 						[$viewport == 'mobile' ? 'x' : 'y']: direction * -1 * 150
 					}}
-					class="relative rounded-[48px] bg-stone-700 py-5 px-5 m-2 bg-opacity-[.30] w-max"
+					class="relative rounded-[48px] bg-stone-700 py-5 px-5 m-2 bg-opacity-[.30] w-full"
 					id="boxShadow"
 				>
 					{#if auth}
@@ -358,7 +358,7 @@
 						</div>
 					{/if}
 					<div class="flex flex-col gap-2 w-80">
-						<img alt="profile" class="w-48 h-48 mx-auto mt-4" src={currentBoss.bossImage} />
+						<img alt="boss" class="w-48 h-48 mx-auto mt-4" src={currentBoss.bossImage} />
 						<div class="h-16 flex justify-center items-center">
 							<div class="font-display text-center text-2xl">
 								{currentBoss.name}
@@ -381,7 +381,7 @@
 									<div class="flex-grow" />
 									<div>
 										<button
-											class="text-xl font-bold p-4 px-6 rounded-full text-black bg-stone-200"
+											class="text-xl p-4 px-6 rounded-full font-bold text-black bg-stone-200"
 											on:click={() => addDeath(currentBoss)}>Add Death</button
 										>
 									</div>
@@ -413,7 +413,12 @@
 	<div class="flex-none">
 		<ParentBox>
 			<div class="flex flex-col">
-				<img src={user.profilePicture} class="w-56 h-56 rounded-full p-10" alt="profile" />
+				<img
+					src={user.profilePicture}
+					class="w-56 h-56 rounded-full p-10"
+					alt="profile"
+					referrerpolicy="no-referrer"
+				/>
 				<div class="m-2 flex flex-col">
 					<div class="flex gap-2 items-center">
 						<IconoirUser />

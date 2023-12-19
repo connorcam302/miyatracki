@@ -215,7 +215,7 @@
 							</div>
 							<div class="grow" />
 							<div class="flex-0 flex-grow-0 h-20 w-20">
-								<img class="rounded-full h-full w-full" src={profilePicture} alt="profile" />
+								<img class="rounded-full h-full w-full" src={profilePicture} alt="profile" referrerpolicy="no-referrer"/>
 							</div>
 						</div>
 					</button>
