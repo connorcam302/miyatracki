@@ -25,9 +25,11 @@ export const GET = async (event) => {
 					displayName: user.email.split('@')[0],
 					profilePicture: user.user_metadata.avatar_url
 				});
-				throw redirect(303, `/profile`);
+				const userData = await db.select().from(userTable).where(eq(userTable.uid, user.id));
+				throw redirect(303, `/auth/create/?user=${userData[0].id}`);
 			} else if (userExist.length > 0) {
-				throw redirect(303, `/profile`);
+				const userData = await db.select().from(userTable).where(eq(userTable.uid, user.id));
+				throw redirect(303, `/user/${userData[0].id}`);
 			}
 		}
 	}

@@ -140,11 +140,14 @@
 					<div class="flex-1 flex justify-end items-center">
 						<div class="flex gap-3">
 							{#if session && userData}
-								<img
-									src={userData.profilePicture}
-									class="object-cover h-12 w-12 rounded-full"
-									alt="profile"
-								/>
+								<button on:click={() => goto(`/user/${userData.id}`)}>
+									<img
+										src={userData.profilePicture}
+										class="object-cover h-12 w-12 rounded-full"
+										alt="profile"
+										referrerpolicy="no-referrer"
+									/>
+								</button>
 								<button
 									on:click={() => supabase.auth.signOut()}
 									class="bg-stone-700 rounded-full h-12 w-12"
@@ -211,6 +214,7 @@
 								src={userData.profilePicture}
 								class="object-cover h-12 w-12 rounded-full"
 								alt="profile"
+								referrerpolicy="no-referrer"
 							/>
 							<div class="align-bottom text-2xl">{userData.displayName}</div>
 						</div>
@@ -265,14 +269,6 @@
 {/if}
 
 <style>
-	#page {
-		background-color: hsla(106, 0%, 9%, 1);
-		background-image: radial-gradient(at 20% 89%, hsla(19, 52%, 20%, 0.43) 0px, transparent 50%),
-			radial-gradient(at 88% 23%, hsla(0, 0%, 20%, 1) 0px, transparent 50%),
-			radial-gradient(at 33% 36%, hsla(42, 74%, 20%, 0.53) 0px, transparent 50%),
-			radial-gradient(at 86% 73%, hsla(42, 74%, 20%, 0.53) 0px, transparent 50%);
-	}
-
 	#backdrop {
 		position: fixed;
 		top: 0;

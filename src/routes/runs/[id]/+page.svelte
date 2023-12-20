@@ -30,7 +30,6 @@
 		const searchBoss = bossList.find((boss) => boss.id === urlBoss);
 		if (searchBoss === undefined) {
 			currentBoss = bossList[0];
-			console.log(`Boss with id ${urlBoss} not found`);
 		} else {
 			currentBoss = searchBoss;
 		}
@@ -144,8 +143,6 @@
 		return bossWithLatestDeathDate;
 	};
 
-	console.log(getLatestBoss());
-
 	$: optionsVisible = false;
 	const toggleOptions = () => {
 		optionsVisible = !optionsVisible;
@@ -200,7 +197,6 @@
 	};
 
 	$: bossListOpen = false;
-	$: console.log(searchBoss.length);
 	$: if (searchBoss.length > 0) {
 		bossListOpen = true;
 	} else {
@@ -230,7 +226,7 @@
 						>
 					</div>
 					{#if bossListOpen}
-						<div class="overflow-auto h-[420px] pb-8 w-80 flex flex-col gap-2" id="list">
+						<div class="overflow-auto h-[420px] pb-8 w-80 flex flex-col gap-2" id="scrollbox">
 							{#if bossList.length === 0}
 								<div>No bosses found</div>
 							{/if}
@@ -268,7 +264,7 @@
 								class="bg-stone-700 w-full pr-2"
 							/>
 						</div>
-						<div class="overflow-auto h-[420px] pb-8 w-72 flex flex-col gap-2" id="list">
+						<div class="overflow-auto h-[420px] pb-8 w-72 flex flex-col gap-2" id="scrollbox">
 							{#if bossList.length === 0}
 								<div>No bosses found</div>
 							{/if}
@@ -311,7 +307,7 @@
 						easing: quintOut,
 						[$viewport == 'mobile' ? 'x' : 'y']: direction * -1 * 150
 					}}
-					class="relative rounded-[48px] bg-stone-700 py-5 px-5 m-2 bg-opacity-[.30] w-max"
+					class="relative rounded-[48px] bg-stone-700 py-5 px-5 m-2 bg-opacity-[.30] w-full"
 					id="boxShadow"
 				>
 					{#if auth}
@@ -358,12 +354,16 @@
 						</div>
 					{/if}
 					<div class="flex flex-col gap-2 w-80">
-						<img alt="profile" class="w-48 h-48 mx-auto mt-4" src={currentBoss.bossImage} />
-						<div class="h-16 flex justify-center items-center">
-							<div class="font-display text-center text-2xl">
-								{currentBoss.name}
+						<button on:click={() => goto(`/boss/${currentBoss.id}`)}>
+							<img alt="boss" class="w-48 h-48 mx-auto mt-4" src={currentBoss.bossImage} />
+						</button>
+						<button on:click={() => goto(`/boss/${currentBoss.id}`)}>
+							<div class="h-16 flex justify-center items-center">
+								<div class="font-display text-center text-2xl">
+									{currentBoss.name}
+								</div>
 							</div>
-						</div>
+						</button>
 						<div class="text-5xl flex items-center justify-center align-middle gap-2">
 							<div class="flex-1 text-right font-title">{currentBoss.deaths}</div>
 							<div class="text-3xl"><IconoirXmark /></div>
@@ -381,7 +381,7 @@
 									<div class="flex-grow" />
 									<div>
 										<button
-											class="text-xl font-bold p-4 px-6 rounded-full text-black bg-stone-200"
+											class="text-xl p-4 px-6 rounded-full font-bold text-black bg-stone-200"
 											on:click={() => addDeath(currentBoss)}>Add Death</button
 										>
 									</div>
@@ -413,7 +413,12 @@
 	<div class="flex-none">
 		<ParentBox>
 			<div class="flex flex-col">
-				<img src={user.profilePicture} class="w-56 h-56 rounded-full p-10" alt="profile" />
+				<img
+					src={user.profilePicture}
+					class="w-56 h-56 rounded-full p-10"
+					alt="profile"
+					referrerpolicy="no-referrer"
+				/>
 				<div class="m-2 flex flex-col">
 					<div class="flex gap-2 items-center">
 						<IconoirUser />
@@ -527,8 +532,19 @@
 {/if}
 
 <style>
-	#list {
+	#scrollbox {
 		mask-image: linear-gradient(to bottom, black calc(100% - 48px), transparent 100%);
+		float: left;
+		overflow-y: scroll;
+	}
+
+	#scrollbox::-webkit-scrollbar {
+		width: 4px;
+	}
+
+	#scrollbox::-webkit-scrollbar-thumb {
+		background-color: #e7e5e4;
+		border-radius: 64px;
 	}
 
 	#backdrop {
