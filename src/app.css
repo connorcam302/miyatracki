@@ -23,3 +23,16 @@ body {
 input {
 	outline: none;
 }
+
+html {
+	overflow-y: scroll;
+}
+
+html::-webkit-scrollbar {
+	width: 8px;
+}
+
+html::-webkit-scrollbar-thumb {
+	background-color: #e7e5e4;
+	border-radius: 64px;
+}

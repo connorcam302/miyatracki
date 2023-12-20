@@ -140,12 +140,14 @@
 					<div class="flex-1 flex justify-end items-center">
 						<div class="flex gap-3">
 							{#if session && userData}
-								<img
-									src={userData.profilePicture}
-									class="object-cover h-12 w-12 rounded-full"
-									alt="profile"
-									referrerpolicy="no-referrer"
-								/>
+								<button on:click={() => goto(`/user/${userData.id}`)}>
+									<img
+										src={userData.profilePicture}
+										class="object-cover h-12 w-12 rounded-full"
+										alt="profile"
+										referrerpolicy="no-referrer"
+									/>
+								</button>
 								<button
 									on:click={() => supabase.auth.signOut()}
 									class="bg-stone-700 rounded-full h-12 w-12"

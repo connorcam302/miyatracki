@@ -14,7 +14,6 @@
 	export let data;
 
 	const { games, userData } = data;
-	console.log(games);
 
 	let nameValue;
 	let experienceValue = 0;
@@ -129,7 +128,6 @@
 
 		returnedRuns = runs;
 
-		console.log(runs);
 		return;
 	};
 
@@ -215,7 +213,12 @@
 							</div>
 							<div class="grow" />
 							<div class="flex-0 flex-grow-0 h-20 w-20">
-								<img class="rounded-full h-full w-full" src={profilePicture} alt="profile" referrerpolicy="no-referrer"/>
+								<img
+									class="rounded-full h-full w-full"
+									src={profilePicture}
+									alt="profile"
+									referrerpolicy="no-referrer"
+								/>
 							</div>
 						</div>
 					</button>

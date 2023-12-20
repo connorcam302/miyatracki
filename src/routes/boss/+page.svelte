@@ -66,28 +66,30 @@
 				<ParentBox>
 					<div>
 						<div class="text-3xl m-2 text-center">{game.name}</div>
-						{#each game.bosses as boss}
-							<button on:click={() => goto(`/boss/${boss.bossId}`)}>
-								<ChildBox>
-									<div class="w-64 h-full flex flex-col pb-2">
-										<div class="pb-2 grow flex justify-center items-center">
-											<div class="text-center text-xl w-full">
-												{boss.bossName}
+						<div class="w-full flex flex-wrap justify-center items-center">
+							{#each game.bosses as boss}
+								<button on:click={() => goto(`/boss/${boss.bossId}`)}>
+									<ChildBox>
+										<div class="w-64 h-full flex flex-col pb-2">
+											<div class="pb-2 grow flex justify-center items-center">
+												<div class="text-center text-xl w-full">
+													{boss.bossName}
+												</div>
 											</div>
+											{#if boss.bossImage}
+												<img class="w-52 h-52 mx-auto" src={boss.bossImage} alt="boss" />
+											{:else}
+												<img
+													class="w-52 h-52 mx-auto"
+													src="https://epnhpyyerjkkyxartywd.supabase.co/storage/v1/object/public/boss-images/ds1/artorias.png"
+													alt="boss"
+												/>
+											{/if}
 										</div>
-										{#if boss.bossImage}
-											<img class="w-52 h-52 mx-auto" src={boss.bossImage} alt="boss" />
-										{:else}
-											<img
-												class="w-52 h-52 mx-auto"
-												src="https://epnhpyyerjkkyxartywd.supabase.co/storage/v1/object/public/boss-images/ds1/artorias.png"
-												alt="boss"
-											/>
-										{/if}
-									</div>
-								</ChildBox>
-							</button>
-						{/each}
+									</ChildBox>
+								</button>
+							{/each}
+						</div>
 					</div>
 				</ParentBox>
 			{/each}

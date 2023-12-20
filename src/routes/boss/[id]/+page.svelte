@@ -7,6 +7,8 @@
 	import MdiTallyMark4 from 'virtual:icons/mdi/tally-mark-4';
 	import IconoirGym from 'virtual:icons/iconoir/gym';
 	import IconoirMagicWand from 'virtual:icons/iconoir/magic-wand';
+	import IconoirNavArrowRight from 'virtual:icons/iconoir/nav-arrow-right';
+	import IconoirNavArrowLeft from 'virtual:icons/iconoir/nav-arrow-left';
 	import tippy from 'sveltejs-tippy';
 	import { goto } from '$app/navigation';
 
@@ -69,17 +71,34 @@
 		getUserRatings();
 		getUserRuns();
 	});
-
-	$: console.log(boss, rating, deaths, userData);
 </script>
 
+<div class="flex mx-4 my-2">
+	{#if bossId !== 1}
+		<button
+			class="text-xl bg-stone-200 text-black p-2 rounded-full"
+			on:click={() => goto(`/boss/${bossId - 1}`)}><IconoirNavArrowLeft /></button
+		>
+	{/if}
+	<div class="grow" />
+	{#if bossId !== 177}
+		<button
+			class="text-xl bg-stone-200 text-black p-2 rounded-full"
+			on:click={() => goto(`/boss/${bossId + 1}`)}><IconoirNavArrowRight /></button
+		>
+	{/if}
+</div>
 <div class="flex flex-wrap justify-center text-2xl text-stone-200">
 	<div>
 		<ParentBox>
 			<div class="flex flex-col items-center gap-8">
 				<div class="flex flex-col px-4 pt-2 items-center">
-					<img class="h-64 w-64" src={bossImage} alt="boss" />
-					<div>{bossName}</div>
+					<button on:click={() => goto(`/boss/${bossId}`)}>
+						<img class="h-64 w-64" src={bossImage} alt="boss" />
+					</button>
+					<button on:click={() => goto(`/boss/${bossId}`)} class="w-64">
+						<div>{bossName}</div>
+					</button>
 					<div class="text-lg opacity-60">{game}</div>
 				</div>
 				<div class="flex flex-col w-full items-center gap-1">

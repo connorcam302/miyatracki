@@ -7,11 +7,10 @@ import {
 	userTable
 } from '$lib/server/schema';
 import { eq } from 'drizzle-orm';
+import { getDateString } from '$lib/functions';
 
 export const load = async ({ fetch, data, params }) => {
 	const { id } = params;
-	console.log('id', id);
-
 	const userData = await db.select().from(userTable).where(eq(userTable.id, id));
 	const runData = await db
 		.select()
@@ -22,21 +21,25 @@ export const load = async ({ fetch, data, params }) => {
 		.select()
 		.from(bossRatingsTable)
 		.where(eq(bossRatingsTable.userId, id))
-		.innerJoin(bossesTable, eq(bossRatingsTable.bossId, bossesTable.bossId));
+		.innerJoin(bossesTable, eq(bossRatingsTable.bossId, bossesTable.bossId))
+		.innerJoin(gamesTable, eq(bossesTable.bossGame, gamesTable.gameId));
 
 	const user = userData[0];
 	const runs = runData.map((run) => {
 		return {
 			...run.Runs,
-			game: run.Games.gameTitle
+			game: run.Games.gameTitle,
+			runTimeString: getDateString(run.Runs.runStartDate)
 		};
 	});
 
 	const ratings = ratingData.map((rating) => {
 		return {
-			...rating,
+			...rating.BossRatings,
+			bossGame: rating.Games.gameTitle,
 			boss: rating.Bosses.bossName,
-			bossImage: rating.Bosses.bossImage
+			bossImage: rating.Bosses.bossImage,
+			ratingTimeString: getDateString(Number(rating.BossRatings.timestamp))
 		};
 	});
 
