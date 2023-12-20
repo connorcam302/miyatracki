@@ -59,7 +59,7 @@
 			response.then((res) => {
 				if (res.status === 200) {
 					res.json().then((data) => {
-						if (data.length > 0) {
+						if (data.data.length > 0) {
 							userDifficultyRating = data.data[0].difficultyRating;
 							userEnjoymentRating = data.data[0].enjoymentRating;
 						}
