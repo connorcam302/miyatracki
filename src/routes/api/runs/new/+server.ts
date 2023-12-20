@@ -17,8 +17,9 @@ export const POST: RequestHandler = async ({ url }) => {
 	};
 
 	try {
-		await db.insert(runsTable).values(newRun);
-		return json(customResponse(201, `Run ${newRun.runName} created.`, [newRun]));
+		console.log(newRun);
+		const run = await db.insert(runsTable).values(newRun).returning();
+		return json(customResponse(201, `Run ${newRun.runName} created.`, [run]));
 	} catch (error) {
 		return json(customResponse(500, `Error creating run ${newRun.runName}.`));
 	}

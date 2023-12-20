@@ -35,7 +35,7 @@
 
 	regenerateName();
 
-	const handleSubmit = () => {
+	const handleSubmit = async () => {
 		if (gameValue === 'Select a Game') {
 			error = 'Please select a game.';
 			return;
@@ -61,7 +61,9 @@
 		})
 			.then((res) => {
 				if (res.status === 200) {
-					toggleVisible();
+					res.json().then((data) => {
+						goto(`/runs/${data.data[0][0].runId}`);
+					});
 				}
 			})
 			.catch((err) => {
