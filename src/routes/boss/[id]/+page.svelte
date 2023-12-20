@@ -9,6 +9,7 @@
 	import IconoirMagicWand from 'virtual:icons/iconoir/magic-wand';
 	import IconoirNavArrowRight from 'virtual:icons/iconoir/nav-arrow-right';
 	import IconoirNavArrowLeft from 'virtual:icons/iconoir/nav-arrow-left';
+	import { fade } from 'svelte/transition';
 	import tippy from 'sveltejs-tippy';
 	import { goto } from '$app/navigation';
 
@@ -26,12 +27,14 @@
 	$: userEnjoymentRating = 0;
 	$: userRuns = [];
 
+	$: updateButton = 'Update';
+
 	const { boss, supabase, bossData, rating, deaths, userData } = data;
 	const { bossDlc, bossName, bossOptional, bossImage, game, bossId } = boss;
 	const { difficulty, enjoyment, count } = rating;
 
-	const handleRatingUpdate = () => {
-		const response = fetch(
+	const handleRatingUpdate = async () => {
+		await fetch(
 			`/api/boss/${bossId}/user/${userData?.id}?difficulty=${userDifficultyRating}&enjoyment=${userEnjoymentRating}`,
 			{
 				method: 'POST',
@@ -39,7 +42,14 @@
 					'Content-Type': 'application/json'
 				}
 			}
-		);
+		).then((res) => {
+			console.log(res);
+			if (res.status === 200) {
+				console.log('success');
+				updateButton = '✓';
+				setInterval(() => (updateButton = 'Update'), 2000);
+			}
+		});
 	};
 
 	onMount(() => {
@@ -239,8 +249,10 @@
 						<div class="h-2" />
 						<button
 							on:click={() => handleRatingUpdate()}
-							class="text-xl bg-stone-200 text-black p-2 px-4 rounded-full">Update</button
+							class="text-xl bg-stone-200 text-black p-2 px-4 rounded-full w-32"
 						>
+							<div class="">{updateButton}</div>
+						</button>
 					</div>
 				</div>
 				<div class="flex flex-col gap-2 w-full items-center">

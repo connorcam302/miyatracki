@@ -2,6 +2,7 @@
 	import ParentBox from '$lib/components/ParentBox.svelte';
 	import IconoirGym from 'virtual:icons/iconoir/gym';
 	import IconoirMagicWand from 'virtual:icons/iconoir/magic-wand';
+	import { truncateString } from '$lib/functions';
 	import { goto } from '$app/navigation';
 
 	export let data;
@@ -42,12 +43,15 @@
 		<ParentBox>
 			<div class="h-[654px] w-64">
 				<div class="text-3xl font-display text-center">Ratings</div>
-				<div id="scrollbox" class="flex flex-col gap-2 overflow-y-scroll h-72 w-full text-left">
+				<div
+					id="scrollbox"
+					class="flex flex-col gap-2 overflow-y-scroll h-[600px] w-full text-left pr-2"
+				>
 					{#each ratings as { boss, bossId, enjoymentRating, difficultyRating, bossGame, ratingTimeString }}
 						<button on:click={() => goto(`/boss/${bossId}`)} class="flex items-center w-full">
 							<div class="flex w-full">
 								<div class="flex flex-col text-left">
-									<div class="text-base">{boss}</div>
+									<div class="text-base">{truncateString(boss, 22)}</div>
 									<div class="text-sm opacity-60">{bossGame}</div>
 									<div class="text-sm opacity-60">{ratingTimeString}</div>
 								</div>
