@@ -211,68 +211,70 @@
 			</div>
 		</ParentBox>
 	</div>
-	<div>
-		<ParentBox>
-			<div class="flex flex-col items-center gap-8 w-72">
-				<div class="flex flex-col w-full items-center gap-2">
-					<div>Your Rating</div>
-					<div class="flex flex-col gap-2 justify-center items-center w-full">
-						<div class="flex w-full gap-4">
-							<div class="flex flex-col w-full">
-								<label for="experience" class="text-sm opacity-60">Difficulty</label>
-								<input
-									type="range"
-									class="accent-ember"
-									id="enjoyment"
-									min="0"
-									max="10"
-									bind:value={userDifficultyRating}
-								/>
-							</div>
-							<div>{userDifficultyRating}</div>
-						</div>
-
-						<div class="flex w-full gap-4">
-							<div class="flex flex-col w-full">
-								<label for="enjoyment" class="text-sm opacity-60">Enjoyment</label>
-								<input
-									type="range"
-									class="accent-ember"
-									id="enjoyment"
-									min="0"
-									max="10"
-									bind:value={userEnjoymentRating}
-								/>
-							</div>
-							<div class="text-title">{userEnjoymentRating}</div>
-						</div>
-						<div class="h-2" />
-						<button
-							on:click={() => handleRatingUpdate()}
-							class="text-xl bg-stone-200 text-black p-2 px-4 rounded-full w-32"
-						>
-							<div class="">{updateButton}</div>
-						</button>
-					</div>
-				</div>
-				<div class="flex flex-col gap-2 w-full items-center">
-					<div>Your Attempts</div>
-					<div id="scrollbox" class="flex flex-col gap-2 overflow-y-scroll h-72 w-full text-left">
-						{#each userRuns as { runId, runName, deathCount, runTimeString }}
-							<button on:click={() => goto(`/runs/${runId}`)} class="flex items-center">
-								<div class="flex flex-col">
-									<div class="text-base">{runName}</div>
-									<div class="text-sm opacity-60 text-left">{runTimeString}</div>
+	{#if userData}
+		<div>
+			<ParentBox>
+				<div class="flex flex-col items-center gap-8 w-72">
+					<div class="flex flex-col w-full items-center gap-2">
+						<div>Your Rating</div>
+						<div class="flex flex-col gap-2 justify-center items-center w-full">
+							<div class="flex w-full gap-4">
+								<div class="flex flex-col w-full">
+									<label for="experience" class="text-sm opacity-60">Difficulty</label>
+									<input
+										type="range"
+										class="accent-ember"
+										id="enjoyment"
+										min="0"
+										max="10"
+										bind:value={userDifficultyRating}
+									/>
 								</div>
-								<div class="grow" />
-								<div class="pr-2">{deathCount}</div>
+								<div>{userDifficultyRating}</div>
+							</div>
+
+							<div class="flex w-full gap-4">
+								<div class="flex flex-col w-full">
+									<label for="enjoyment" class="text-sm opacity-60">Enjoyment</label>
+									<input
+										type="range"
+										class="accent-ember"
+										id="enjoyment"
+										min="0"
+										max="10"
+										bind:value={userEnjoymentRating}
+									/>
+								</div>
+								<div class="text-title">{userEnjoymentRating}</div>
+							</div>
+							<div class="h-2" />
+							<button
+								on:click={() => handleRatingUpdate()}
+								class="text-xl bg-stone-200 text-black p-2 px-4 rounded-full w-32"
+							>
+								<div class="">{updateButton}</div>
 							</button>
-						{/each}
+						</div>
+					</div>
+					<div class="flex flex-col gap-2 w-full items-center">
+						<div>Your Attempts</div>
+						<div id="scrollbox" class="flex flex-col gap-2 overflow-y-scroll h-72 w-full text-left">
+							{#each userRuns as { runId, runName, deathCount, runTimeString }}
+								<button on:click={() => goto(`/runs/${runId}`)} class="flex items-center">
+									<div class="flex flex-col">
+										<div class="text-base">{runName}</div>
+										<div class="text-sm opacity-60 text-left">{runTimeString}</div>
+									</div>
+									<div class="grow" />
+									<div class="pr-2">{deathCount}</div>
+								</button>
+							{/each}
+						</div>
 					</div>
 				</div>
-			</div>
-		</ParentBox>
-	</div>
+			</ParentBox>
+		</div>
+	{/if}
 </div>
 
 <style>
