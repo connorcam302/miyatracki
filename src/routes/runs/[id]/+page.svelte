@@ -110,6 +110,8 @@
 			method: 'POST'
 		});
 		if (response.status === 200) {
+			toggleRatingModal();
+
 			bossList[bossIndex].deathDate = Date.now();
 			bossList[bossIndex].deathTimeSince = getTimeSinceEpoch(Date.now());
 			bossList[bossIndex].deathDateString = getDateString(Date.now());
@@ -194,6 +196,34 @@
 			console.log('something went wrong');
 			console.log(await response.json());
 		}
+	};
+
+	$: ratingModalVisible = false;
+	const toggleRatingModal = () => {
+		ratingModalVisible = !ratingModalVisible;
+	};
+
+	let userDifficultyRating = 0;
+	let userEnjoymentRating = 0;
+	let errorText = '';
+
+	const rateBoss = async () => {
+		await fetch(
+			`/api/boss/${currentBoss.id}/user/${userData?.id}?difficulty=${userDifficultyRating}&enjoyment=${userEnjoymentRating}`,
+			{
+				method: 'POST',
+				headers: {
+					'Content-Type': 'application/json'
+				}
+			}
+		).then((res) => {
+			console.log(res);
+			if (res.status === 200) {
+				toggleRatingModal();
+			} else {
+				errorText = 'Something went wrong';
+			}
+		});
 	};
 
 	$: bossListOpen = false;
@@ -526,6 +556,60 @@
 						on:click={() => setDeaths(currentBoss, setDeathsValue)}>Set</button
 					>
 				</div>
+			</div>
+		</div>
+	</div>
+{/if}
+{#if ratingModalVisible}
+	<div
+		transition:fade={{ duration: 200 }}
+		id="backdrop"
+		class="h-screen fixed top-0 w-screen cursor-default flex justify-center items-center"
+		on:click|self={() => toggleReviveModal()}
+		on:keypress={(e) => e.key === 'Escape' && toggleReviveModal()}
+		tabindex="0"
+		role="button"
+	>
+		<div class="absolute opacity-100 w-64 bg-stone-200 rounded-xl p-4 text-stone-800">
+			<div class="flex flex-col gap-2 justify-center items-center w-full">
+				<div>Rate <span class="font-bold">{currentBoss.name}</span></div>
+				<div class="flex w-full gap-4">
+					<div class="flex flex-col w-full">
+						<label for="experience" class="text-sm opacity-60">Difficulty</label>
+						<input
+							type="range"
+							class="accent-ember"
+							id="enjoyment"
+							min="0"
+							max="10"
+							bind:value={userDifficultyRating}
+						/>
+					</div>
+					<div>{userDifficultyRating}</div>
+				</div>
+
+				<div class="flex w-full gap-4">
+					<div class="flex flex-col w-full">
+						<label for="enjoyment" class="text-sm opacity-60">Enjoyment</label>
+						<input
+							type="range"
+							class="accent-ember"
+							id="enjoyment"
+							min="0"
+							max="10"
+							bind:value={userEnjoymentRating}
+						/>
+					</div>
+					<div class="text-title">{userEnjoymentRating}</div>
+				</div>
+				<div class="h-2" />
+				<button
+					on:click={() => rateBoss()}
+					class="text-xl bg-stone-200 text-black p-2 px-4 rounded-full w-32"
+				>
+					<div class="bg-black text-stone-200 p-2 rounded-full">Submit</div>
+				</button>
+				<div class="h-4 text-red-800 text-md">{errorText}</div>
 			</div>
 		</div>
 	</div>
