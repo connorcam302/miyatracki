@@ -40,7 +40,7 @@
 			error = 'Please select a game.';
 			return;
 		}
-		if (userData.id === undefined) {
+		if (userData === null || userData.id === null || userData.id === undefined) {
 			error = 'Please log in to create a run.';
 			return;
 		}

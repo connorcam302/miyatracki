@@ -1,4 +1,4 @@
-<script>
+<script lang="ts">
 	import { getContext, onMount } from 'svelte';
 	import ParentBox from '$lib/components/ParentBox.svelte';
 	import MdiTallyMark1 from 'virtual:icons/mdi/tally-mark-1';
@@ -59,10 +59,12 @@
 			response.then((res) => {
 				if (res.status === 200) {
 					res.json().then((data) => {
-						if (data.data.length > 0) {
-							userDifficultyRating = data.data[0].difficultyRating;
-							userEnjoymentRating = data.data[0].enjoymentRating;
-						}
+						try {
+							if (data.data.length > 0) {
+								userDifficultyRating = data.data[0].difficultyRating;
+								userEnjoymentRating = data.data[0].enjoymentRating;
+							}
+						} catch (e) {}
 					});
 				}
 			});
@@ -83,6 +85,11 @@
 		getUserRatings();
 		getUserRuns();
 	});
+
+	const getAverageString = (average: number, count: number) => {
+		if (average === 0 && count === 0) return '-';
+		else return Math.round(average);
+	};
 </script>
 
 <div class="flex mx-4 my-2">
@@ -127,7 +134,7 @@
 								class="flex flex-col items-center w-full"
 							>
 								<MdiTallyMark1 />
-								<div>{deaths[0].average > 0 ? deaths[0].average : '-'}</div>
+								<div>{getAverageString(deaths[0].average, deaths[0].count)}</div>
 							</button>
 						</div>
 						<div class="grow">
@@ -141,7 +148,7 @@
 								class="flex flex-col items-center w-full"
 							>
 								<MdiTallyMark2 />
-								<div>{deaths[1].average > 0 ? deaths[1].average : '-'}</div>
+								<div>{getAverageString(deaths[1].average, deaths[1].count)}</div>
 							</button>
 						</div>
 						<div class="grow">
@@ -155,7 +162,7 @@
 								class="flex flex-col items-center w-full"
 							>
 								<MdiTallyMark3 />
-								<div>{deaths[2].average > 0 ? deaths[2].average : '-'}</div>
+								<div>{getAverageString(deaths[2].average, deaths[2].count)}</div>
 							</button>
 						</div>
 						<div class="grow">
@@ -169,7 +176,7 @@
 								class="flex flex-col items-center w-full"
 							>
 								<MdiTallyMark4 />
-								<div>{deaths[3].average > 0 ? deaths[3].average : '-'}</div>
+								<div>{getAverageString(deaths[3].average, deaths[3].count)}</div>
 							</button>
 						</div>
 					</div>

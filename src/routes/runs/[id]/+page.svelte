@@ -68,6 +68,7 @@
 
 	let copyState = 'normal';
 	const copyToClipboard = (text) => {
+		navigator.clipboard.writeText(text);
 		copyState = 'copied';
 
 		setTimeout(() => {
@@ -491,6 +492,14 @@
 								{/if}
 							</div>
 						{/key}
+					</div>
+					<div class="mt-4 flex justify-center">
+						<button
+							class="bg-stone-200 text-black rounded-full py-1 px-4 text-center hover:bg-stone-400 duration-200"
+							on:click={() => goto(`/runs/${run.id}/report`)}
+						>
+							Generate Run Report
+						</button>
 					</div>
 				</div>
 			</div>
