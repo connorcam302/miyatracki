@@ -14,7 +14,6 @@
 	export let data;
 
 	const { games, userData } = data;
-	console.log(games);
 
 	let nameValue;
 	let experienceValue = 0;
@@ -36,12 +35,12 @@
 
 	regenerateName();
 
-	const handleSubmit = () => {
+	const handleSubmit = async () => {
 		if (gameValue === 'Select a Game') {
 			error = 'Please select a game.';
 			return;
 		}
-		if (userData.id === undefined) {
+		if (userData === null || userData.id === null || userData.id === undefined) {
 			error = 'Please log in to create a run.';
 			return;
 		}
@@ -62,7 +61,9 @@
 		})
 			.then((res) => {
 				if (res.status === 200) {
-					toggleVisible();
+					res.json().then((data) => {
+						goto(`/runs/${data.data[0][0].runId}`);
+					});
 				}
 			})
 			.catch((err) => {
@@ -129,7 +130,6 @@
 
 		returnedRuns = runs;
 
-		console.log(runs);
 		return;
 	};
 
@@ -215,7 +215,12 @@
 							</div>
 							<div class="grow" />
 							<div class="flex-0 flex-grow-0 h-20 w-20">
-								<img class="rounded-full h-full w-full" src={profilePicture} alt="profile" />
+								<img
+									class="rounded-full h-full w-full"
+									src={profilePicture}
+									alt="profile"
+									referrerpolicy="no-referrer"
+								/>
 							</div>
 						</div>
 					</button>

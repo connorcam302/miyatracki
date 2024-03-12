@@ -46,8 +46,6 @@ export const load = async ({ fetch, data, params }) => {
 		.from(bossDeathsInRunTable)
 		.where(eq(bossDeathsInRunTable.runId, run.id));
 
-	console.log(bossesData);
-
 	const bosses = bossesData.map((boss) => {
 		const { killColour, killText } = getKillButtonInfo(boss.bossId);
 

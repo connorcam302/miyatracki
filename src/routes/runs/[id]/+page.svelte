@@ -30,7 +30,6 @@
 		const searchBoss = bossList.find((boss) => boss.id === urlBoss);
 		if (searchBoss === undefined) {
 			currentBoss = bossList[0];
-			console.log(`Boss with id ${urlBoss} not found`);
 		} else {
 			currentBoss = searchBoss;
 		}
@@ -69,6 +68,7 @@
 
 	let copyState = 'normal';
 	const copyToClipboard = (text) => {
+		navigator.clipboard.writeText(text);
 		copyState = 'copied';
 
 		setTimeout(() => {
@@ -111,6 +111,8 @@
 			method: 'POST'
 		});
 		if (response.status === 200) {
+			toggleRatingModal();
+
 			bossList[bossIndex].deathDate = Date.now();
 			bossList[bossIndex].deathTimeSince = getTimeSinceEpoch(Date.now());
 			bossList[bossIndex].deathDateString = getDateString(Date.now());
@@ -143,8 +145,6 @@
 
 		return bossWithLatestDeathDate;
 	};
-
-	console.log(getLatestBoss());
 
 	$: optionsVisible = false;
 	const toggleOptions = () => {
@@ -199,8 +199,35 @@
 		}
 	};
 
+	$: ratingModalVisible = false;
+	const toggleRatingModal = () => {
+		ratingModalVisible = !ratingModalVisible;
+	};
+
+	let userDifficultyRating = 0;
+	let userEnjoymentRating = 0;
+	let errorText = '';
+
+	const rateBoss = async () => {
+		await fetch(
+			`/api/boss/${currentBoss.id}/user/${userData?.id}?difficulty=${userDifficultyRating}&enjoyment=${userEnjoymentRating}`,
+			{
+				method: 'POST',
+				headers: {
+					'Content-Type': 'application/json'
+				}
+			}
+		).then((res) => {
+			console.log(res);
+			if (res.status === 200) {
+				toggleRatingModal();
+			} else {
+				errorText = 'Something went wrong';
+			}
+		});
+	};
+
 	$: bossListOpen = false;
-	$: console.log(searchBoss.length);
 	$: if (searchBoss.length > 0) {
 		bossListOpen = true;
 	} else {
@@ -230,7 +257,7 @@
 						>
 					</div>
 					{#if bossListOpen}
-						<div class="overflow-auto h-[420px] pb-8 w-80 flex flex-col gap-2" id="list">
+						<div class="overflow-auto h-[420px] pb-8 w-80 flex flex-col gap-2" id="scrollbox">
 							{#if bossList.length === 0}
 								<div>No bosses found</div>
 							{/if}
@@ -268,7 +295,7 @@
 								class="bg-stone-700 w-full pr-2"
 							/>
 						</div>
-						<div class="overflow-auto h-[420px] pb-8 w-72 flex flex-col gap-2" id="list">
+						<div class="overflow-auto h-[420px] pb-8 w-72 flex flex-col gap-2" id="scrollbox">
 							{#if bossList.length === 0}
 								<div>No bosses found</div>
 							{/if}
@@ -311,7 +338,7 @@
 						easing: quintOut,
 						[$viewport == 'mobile' ? 'x' : 'y']: direction * -1 * 150
 					}}
-					class="relative rounded-[48px] bg-stone-700 py-5 px-5 m-2 bg-opacity-[.30] w-max"
+					class="relative rounded-[48px] bg-stone-700 py-5 px-5 m-2 bg-opacity-[.30] w-full"
 					id="boxShadow"
 				>
 					{#if auth}
@@ -358,12 +385,16 @@
 						</div>
 					{/if}
 					<div class="flex flex-col gap-2 w-80">
-						<img alt="profile" class="w-48 h-48 mx-auto mt-4" src={currentBoss.bossImage} />
-						<div class="h-16 flex justify-center items-center">
-							<div class="font-display text-center text-2xl">
-								{currentBoss.name}
+						<button on:click={() => goto(`/boss/${currentBoss.id}`)}>
+							<img alt="boss" class="w-48 h-48 mx-auto mt-4" src={currentBoss.bossImage} />
+						</button>
+						<button on:click={() => goto(`/boss/${currentBoss.id}`)}>
+							<div class="h-16 flex justify-center items-center">
+								<div class="font-display text-center text-2xl">
+									{currentBoss.name}
+								</div>
 							</div>
-						</div>
+						</button>
 						<div class="text-5xl flex items-center justify-center align-middle gap-2">
 							<div class="flex-1 text-right font-title">{currentBoss.deaths}</div>
 							<div class="text-3xl"><IconoirXmark /></div>
@@ -381,7 +412,7 @@
 									<div class="flex-grow" />
 									<div>
 										<button
-											class="text-xl font-bold p-4 px-6 rounded-full text-black bg-stone-200"
+											class="text-xl p-4 px-6 rounded-full font-bold text-black bg-stone-200"
 											on:click={() => addDeath(currentBoss)}>Add Death</button
 										>
 									</div>
@@ -413,7 +444,12 @@
 	<div class="flex-none">
 		<ParentBox>
 			<div class="flex flex-col">
-				<img src={user.profilePicture} class="w-56 h-56 rounded-full p-10" alt="profile" />
+				<img
+					src={user.profilePicture}
+					class="w-56 h-56 rounded-full p-10"
+					alt="profile"
+					referrerpolicy="no-referrer"
+				/>
 				<div class="m-2 flex flex-col">
 					<div class="flex gap-2 items-center">
 						<IconoirUser />
@@ -456,6 +492,14 @@
 								{/if}
 							</div>
 						{/key}
+					</div>
+					<div class="mt-4 flex justify-center">
+						<button
+							class="bg-stone-200 text-black rounded-full py-1 px-4 text-center hover:bg-stone-400 duration-200"
+							on:click={() => goto(`/runs/${run.id}/report`)}
+						>
+							Generate Run Report
+						</button>
 					</div>
 				</div>
 			</div>
@@ -525,10 +569,75 @@
 		</div>
 	</div>
 {/if}
+{#if ratingModalVisible}
+	<div
+		transition:fade={{ duration: 200 }}
+		id="backdrop"
+		class="h-screen fixed top-0 w-screen cursor-default flex justify-center items-center"
+		on:click|self={() => toggleReviveModal()}
+		on:keypress={(e) => e.key === 'Escape' && toggleReviveModal()}
+		tabindex="0"
+		role="button"
+	>
+		<div class="absolute opacity-100 w-64 bg-stone-200 rounded-xl p-4 text-stone-800">
+			<div class="flex flex-col gap-2 justify-center items-center w-full">
+				<div>Rate <span class="font-bold">{currentBoss.name}</span></div>
+				<div class="flex w-full gap-4">
+					<div class="flex flex-col w-full">
+						<label for="experience" class="text-sm opacity-60">Difficulty</label>
+						<input
+							type="range"
+							class="accent-ember"
+							id="enjoyment"
+							min="0"
+							max="10"
+							bind:value={userDifficultyRating}
+						/>
+					</div>
+					<div>{userDifficultyRating}</div>
+				</div>
+
+				<div class="flex w-full gap-4">
+					<div class="flex flex-col w-full">
+						<label for="enjoyment" class="text-sm opacity-60">Enjoyment</label>
+						<input
+							type="range"
+							class="accent-ember"
+							id="enjoyment"
+							min="0"
+							max="10"
+							bind:value={userEnjoymentRating}
+						/>
+					</div>
+					<div class="text-title">{userEnjoymentRating}</div>
+				</div>
+				<div class="h-2" />
+				<button
+					on:click={() => rateBoss()}
+					class="text-xl bg-stone-200 text-black p-2 px-4 rounded-full w-32"
+				>
+					<div class="bg-black text-stone-200 p-2 rounded-full">Submit</div>
+				</button>
+				<div class="h-4 text-red-800 text-md">{errorText}</div>
+			</div>
+		</div>
+	</div>
+{/if}
 
 <style>
-	#list {
+	#scrollbox {
 		mask-image: linear-gradient(to bottom, black calc(100% - 48px), transparent 100%);
+		float: left;
+		overflow-y: scroll;
+	}
+
+	#scrollbox::-webkit-scrollbar {
+		width: 4px;
+	}
+
+	#scrollbox::-webkit-scrollbar-thumb {
+		background-color: #e7e5e4;
+		border-radius: 64px;
 	}
 
 	#backdrop {
