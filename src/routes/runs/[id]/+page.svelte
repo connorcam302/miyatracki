@@ -574,8 +574,8 @@
 		transition:fade={{ duration: 200 }}
 		id="backdrop"
 		class="h-screen fixed top-0 w-screen cursor-default flex justify-center items-center"
-		on:click|self={() => toggleReviveModal()}
-		on:keypress={(e) => e.key === 'Escape' && toggleReviveModal()}
+		on:click|self={() => toggleRatingModal()}
+		on:keypress={(e) => e.key === 'Escape' && toggleRatingModal()}
 		tabindex="0"
 		role="button"
 	>
