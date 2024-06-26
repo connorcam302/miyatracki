@@ -108,29 +108,25 @@ export const getDateString = (epochTimestamp: number) => {
 /**
  * Returns the boss with the soonest death date.
  * @param deathRecords An array of death records.
- * @param bossArray An array of boss objects.
  * @returns The boss object with the soonest death date.
  */
-export const getBossWithSoonestDeath = (deathArray) => {
-	// Ensure the array is non-empty
-	if (deathArray.length === 0) {
-		return null; // Array is empty
+export const getBossWithSoonestDeath = (bosses) => {
+	if (!bosses || bosses.length === 0) {
+		return null; // Handle case where array is empty or undefined
 	}
 
-	// Filter out objects with null deathDate
-	const validObjects = deathArray.filter((obj) => obj.deathDate !== null);
+	// Initialize with the first boss
+	let bossWithLargestDeathDate = bosses[0];
 
-	// If all deathDates are null, return null
-	if (validObjects.length === 0) {
-		return null;
+	// Iterate through the array to find the boss with the largest death date
+	for (let i = 1; i < bosses.length; i++) {
+		if (bosses[i].deathDate > bossWithLargestDeathDate.deathDate) {
+			bossWithLargestDeathDate = bosses[i];
+		}
 	}
 
-	// Find the object with the soonest deathDate
-	const soonestDeathObject = validObjects.reduce((minObj, currentObj) => {
-		return currentObj.deathDate < minObj.deathDate ? currentObj : minObj;
-	}, validObjects[0]);
-
-	return soonestDeathObject;
+	// Return the boss object with the largest death date found
+	return bossWithLargestDeathDate;
 };
 
 /**

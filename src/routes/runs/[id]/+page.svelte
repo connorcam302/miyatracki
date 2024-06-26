@@ -21,6 +21,7 @@
 	import { getContext } from 'svelte';
 
 	const { run, bosses, user, userData } = data;
+	console.log(data);
 	$: viewport = getContext('viewport');
 	let bossList = bosses;
 	let urlBoss = Number($page.url.searchParams.get('boss'));
@@ -453,7 +454,12 @@
 				<div class="m-2 flex flex-col">
 					<div class="flex gap-2 items-center">
 						<IconoirUser />
-						<div class="opacity-60">{user.displayName}</div>
+						<button
+							on:click|stopPropagation={() => goto(`/user/${run.userId}`)}
+							class="opacity-60 items-center hover:text-stone-400 duration-200"
+						>
+							<div>{user.displayName}</div>
+						</button>
 					</div>
 					<div class="flex gap-2 items-center">
 						<IconoirGamepad />
@@ -502,8 +508,8 @@
 						</button>
 					</div>
 				</div>
-			</div>
-		</ParentBox>
+			</div></ParentBox
+		>
 	</div>
 </div>
 {#if reviveModalVisible}

@@ -8,7 +8,7 @@ import {
 	runsTable,
 	userTable
 } from '$lib/server/schema';
-import { eq, and, avg } from 'drizzle-orm';
+import { eq, and, avg, sql } from 'drizzle-orm';
 import {
 	getDateString,
 	getBossWithSoonestDeath,
@@ -47,7 +47,32 @@ export const load = async ({ fetch, data, params }) => {
 		.leftJoin(dlcTable, eq(dlcTable.dlcId, bossesTable.bossDlc))
 		.where(eq(bossesTable.bossGame, runDataArray[0].gameId));
 
-	const bossAverages = await db
+	const bossData = await db
+		.select({
+			bossId: bossesTable.bossId,
+			bossName: bossesTable.bossName,
+			deaths: bossDeathsInRunTable.deathCount,
+			deathDate: bossDeathsInRunTable.deathDate,
+			difficulty: bossRatingsTable.difficultyRating,
+			enjoyment: bossRatingsTable.enjoymentRating
+		})
+		.from(bossesTable)
+		.leftJoin(
+			bossDeathsInRunTable,
+			and(
+				eq(bossesTable.bossId, bossDeathsInRunTable.bossId),
+				eq(bossDeathsInRunTable.runId, params.id)
+			)
+		)
+		.leftJoin(
+			bossRatingsTable,
+			and(
+				eq(bossRatingsTable.bossId, bossesTable.bossId),
+				eq(bossRatingsTable.userId, runDataArray[0].user.id)
+			)
+		);
+
+	const averageDeaths = await db
 		.select({
 			bossId: bossesTable.bossId,
 			averageDeaths: avg(bossDeathsInRunTable.deathCount)
@@ -63,25 +88,32 @@ export const load = async ({ fetch, data, params }) => {
 		)
 		.groupBy(bossesTable.bossId);
 
-	const bossData = await db
+	// Query to get average ratings without filtering by experience level
+	const averageRatings = await db
 		.select({
-			bossId: bossDeathsInRunTable.bossId,
-			deaths: bossDeathsInRunTable.deathCount,
-			deathDate: bossDeathsInRunTable.deathDate,
-			difficulty: bossRatingsTable.difficultyRating,
-			enjoyment: bossRatingsTable.enjoymentRating
+			bossId: bossesTable.bossId,
+			averageDifficulty: avg(bossRatingsTable.difficultyRating),
+			averageEnjoyment: avg(bossRatingsTable.enjoymentRating)
 		})
 		.from(bossesTable)
-		.innerJoin(bossDeathsInRunTable, eq(bossesTable.bossId, bossDeathsInRunTable.bossId))
-		.innerJoin(bossRatingsTable, eq(bossRatingsTable.bossId, bossesTable.bossId))
-		.where(
-			and(
-				eq(bossRatingsTable.userId, runDataArray[0].user.id),
-				eq(bossDeathsInRunTable.runId, params.id)
-			)
-		);
+		.leftJoin(bossRatingsTable, eq(bossesTable.bossId, bossRatingsTable.bossId))
+		.where(eq(bossesTable.bossGame, runDataArray[0].gameId))
+		.groupBy(bossesTable.bossId)
+		.execute(); // Combine the results in your application code
 
-	console.log(bossData);
+	const bossAverages = averageDeaths.map((deathRecord) => {
+		const ratingRecord = averageRatings.find((rating) => rating.bossId === deathRecord.bossId);
+		return {
+			bossId: deathRecord.bossId,
+			averageDeaths: deathRecord.averageDeaths,
+			averageDifficulty: ratingRecord ? ratingRecord.averageDifficulty : null,
+			averageEnjoyment: ratingRecord ? ratingRecord.averageEnjoyment : null
+		};
+	});
+
+	console.log(bossAverages);
+
+	console.log(bossData.find((data) => data.bossId === 196));
 
 	const gameDlcs = await db
 		.select({
@@ -102,10 +134,17 @@ export const load = async ({ fetch, data, params }) => {
 					? bossData.find((data) => data.bossId === boss.bossId)?.deaths
 					: null,
 			deathDate: bossData.find((data) => data.bossId === boss.bossId)?.deathDate || 0,
-			difficulty: bossData.find((data) => data.bossId === boss.bossId)?.difficulty || 0,
-			enjoyment: bossData.find((data) => data.bossId === boss.bossId)?.enjoyment || 0
+			difficulty: bossData.find((data) => data.bossId === boss.bossId)?.difficulty || '-',
+			averageDifficulty:
+				bossAverages.find((average) => average.bossId === boss.bossId)?.averageDifficulty || 0,
+			enjoyment: bossData.find((data) => data.bossId === boss.bossId)?.enjoyment || '-',
+			averageEnjoyment:
+				bossAverages.find((average) => average.bossId === boss.bossId)?.averageEnjoyment || 0
 		};
 	});
+
+	const trimmedBossData = bossesArray.filter((average) => average.deathDate !== 0);
+	console.log(trimmedBossData);
 
 	const reports = [
 		{
@@ -119,7 +158,44 @@ export const load = async ({ fetch, data, params }) => {
 				name: dlc.dlcTitle,
 				bosses: bossesArray.filter((boss) => boss.dlcId === dlc.dlcId)
 			};
-		})
+		}),
+		{
+			id: 'total',
+			name: 'Total',
+			bosses: [
+				{
+					bossId: -1,
+					bossName: 'Total',
+					// average deaths for every boss totalled
+					averageDeaths: bossAverages
+						.reduce((acc, boss) => acc + Number(boss.averageDeaths), 0)
+						.toFixed(1),
+					deaths: bossData.reduce((acc, boss) => acc + boss.deaths, 0),
+					deathDate: getBossWithSoonestDeath(bossData).deathDate,
+					// get the average difficulty and enjoyment from bossdata for every boss totalled
+					difficulty:
+						(
+							trimmedBossData.reduce((acc, boss) => acc + boss.difficulty, 0) /
+							trimmedBossData.length
+						).toFixed(1) || 0,
+					averageDifficulty:
+						(
+							trimmedBossData.reduce((acc, boss) => acc + Number(boss.averageDifficulty), 0) /
+							trimmedBossData.length
+						).toFixed(1) || 0,
+					enjoyment:
+						(
+							trimmedBossData.reduce((acc, boss) => acc + boss.enjoyment, 0) /
+							trimmedBossData.length
+						).toFixed(1) || 0,
+					averageEnjoyment:
+						(
+							trimmedBossData.reduce((acc, boss) => acc + Number(boss.averageEnjoyment), 0) /
+							trimmedBossData.length
+						).toFixed(1) || 0
+				}
+			]
+		}
 	];
 
 	return { runData: runDataArray[0], reports };
