@@ -12,3 +12,5 @@ vite.config.ts.timestamp-*
 .env*.local
 .sql
 bun.lockb*
+local-dev.db
+db-dump.sql

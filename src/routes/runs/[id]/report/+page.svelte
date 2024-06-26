@@ -107,38 +107,62 @@
 							<div
 								class="flex flex-row gap-2 border-t-stone-400 border-t-[1px] border-opacity-30 h-8"
 							>
-								{#if boss.deaths !== null}
+								{#if boss.deathDate !== 0}
 									<button
 										class="text-left w-64 lg:w-96 truncate hover:text-stone-400 duration-200"
 										on:click={() => goto(`/boss/${boss.bossId}`)}>{boss.bossName}</button
 									>
+
 									<div
 										class="w-8 text-center"
 										style="color: {getDeathsColour(boss.deaths, Math.round(boss.averageDeaths))}"
 										use:tippy={{
-											content: `<b>${Math.abs(
-												boss.deaths - Math.round(boss.averageDeaths)
-											)} </b> death${
-												Math.abs(boss.deaths - Math.round(boss.averageDeaths)) > 1 ? 's' : ''
-											} ${boss.deaths > boss.averageDeaths ? 'above' : 'below'} average.`,
+											content: `Average deaths: ${Math.round(boss.averageDeaths)}`,
 											placement: 'left',
 											allowHTML: true
 										}}
 									>
 										{boss.deaths}
 									</div>
-									<div class="w-8 text-center">{boss.difficulty}</div>
-									<div class="w-8 text-center">{boss.enjoyment}</div>
+									<div
+										class="w-8 text-center"
+										use:tippy={{
+											content: `Average difficulty: ${boss.averageDifficulty}`,
+											placement: 'left',
+											allowHTML: true
+										}}
+									>
+										{boss.difficulty}
+									</div>
+									<div
+										class="w-8 text-center"
+										use:tippy={{
+											content: `Average enjoyment: ${boss.averageEnjoyment}`,
+											placement: 'left',
+											allowHTML: true
+										}}
+									>
+										{boss.enjoyment}
+									</div>
 									<div class="hidden lg:block">
 										<div class="w-48 text-center">
 											{dayjs(boss.deathDate).format('Do MMMM YYYY')}
 										</div>
 									</div>
 								{:else}
-									<div class="w-64 lg:w-96 truncate line-through text-stone-400">
-										{boss.bossName}
-									</div>
-									<div class="w-8 text-center text-stone-400">-</div>
+									{#if boss.deaths == null}
+										<button
+											class="text-left w-64 lg:w-96 truncate line-through text-stone-400 hover:text-stone-500 duration-200"
+											on:click={() => goto(`/boss/${boss.bossId}`)}>{boss.bossName}</button
+										>
+										<div class="w-8 text-center text-stone-400">-</div>
+									{:else}
+										<button
+											class="text-left w-64 lg:w-96 truncate text-stone-400 hover:text-stone-500 duration-200"
+											on:click={() => goto(`/boss/${boss.bossId}`)}>{boss.bossName}</button
+										>
+										<div class="w-8 text-center text-stone-400">{boss.deaths}</div>
+									{/if}
 									<div class="w-8 text-center text-stone-400">-</div>
 									<div class="w-8 text-center text-stone-400">-</div>
 								{/if}
