@@ -1,4 +1,4 @@
-<script>
+<script lang="ts">
 	export let data;
 	import ParentBox from '$lib/components/ParentBox.svelte';
 	import IconoirSearch from 'virtual:icons/iconoir/search';
@@ -9,6 +9,8 @@
 	import IconoirClock from 'virtual:icons/iconoir/clock';
 	import IconoirGym from 'virtual:icons/iconoir/gym';
 	import MaterialSymbolsHeartBroken from 'virtual:icons/material-symbols/heart-broken';
+	import LetsIconsExpandLeft from '~icons/lets-icons/expand-left';
+	import LetsIconsExpandRight from '~icons/lets-icons/expand-right';
 	import IconoirXmark from 'virtual:icons/iconoir/xmark';
 	import IconoirCircle from 'virtual:icons/iconoir/circle';
 	import IconoirCheckCircle from 'virtual:icons/iconoir/check-circle';
@@ -21,7 +23,6 @@
 	import { getContext } from 'svelte';
 
 	const { run, bosses, user, userData } = data;
-	console.log(data);
 	$: viewport = getContext('viewport');
 	let bossList = bosses;
 	let urlBoss = Number($page.url.searchParams.get('boss'));
@@ -61,6 +62,7 @@
 		} else {
 			direction = '-1';
 		}
+		bossListOpen = false;
 
 		currentBoss = boss;
 		$page.url.searchParams.set('boss', boss.id);
@@ -229,287 +231,314 @@
 	};
 
 	$: bossListOpen = false;
+	const toggleBossList = () => {
+		bossListOpen = !bossListOpen;
+	};
 	$: if (searchBoss.length > 0) {
 		bossListOpen = true;
 	} else {
 		bossListOpen = false;
 	}
+
+	$: filter = 'all';
+	const setFilter = (newFilter) => {
+		filter = newFilter;
+		switch (newFilter) {
+			case 'all':
+				bossList = bosses;
+				break;
+			case 'killed':
+				bossList = bosses.filter((boss) => boss.deathDate !== null);
+				break;
+			case 'not-killed':
+				bossList = bosses.filter((boss) => boss.deathDate === null);
+				break;
+			case 'ongoing':
+				bossList = bosses.filter((boss) => boss.deathDate === null && boss.deaths > 0);
+				break;
+		}
+	};
+
+	const getStatColour = (stat: number, averageStat: number) => {
+		if (stat === averageStat) return '#e7e5e4';
+		if (stat > averageStat) return '#ef4444';
+		if (stat < averageStat) return '#22c55e';
+	};
+
+	//$: console.log(data);
 </script>
 
-<div class="flex flex-wrap justify-center items-center">
-	<div class="flex flex-none">
-		<ParentBox>
-			{#if $viewport === 'mobile'}
-				<div class="flex flex-col transition-all">
-					<div class="w-80 flex items-center gap-2">
-						<div class="bg-stone-700 flex gap-2 items-center rounded-xl px-2 my-2 grow">
-							<IconoirSearch />
-							<input
-								type="text"
-								placeholder="Seach bosses..."
-								bind:value={searchBoss}
-								on:input={() => (bossList = searchBossesByName(bosses, searchBoss))}
-								class="bg-stone-700 w-full pr-2"
-							/>
-						</div>
-						<button
-							class="bg-stone-200 text-black rounded-full px-2 text-xl"
-							on:click={() => (searchBoss = '')}><IconoirXmark /></button
-						>
-					</div>
-					{#if bossListOpen}
-						<div class="overflow-auto h-[420px] pb-8 w-80 flex flex-col gap-2" id="scrollbox">
-							{#if bossList.length === 0}
-								<div>No bosses found</div>
-							{/if}
-							{#each bossList as boss}
-								<div>
-									<button
-										class="w-full text-left font-display leading-5 flex gap-1 align-top items-top"
-										on:click={() => setBoss(boss)}
-										>{#if boss.deathDate}
-											<div>
-												<IconoirCheckCircle />
-											</div>
-										{:else}
-											<div>
-												<IconoirCircle />
-											</div>
-										{/if}
-										{boss.name}
-									</button>
-								</div>
-							{/each}
-						</div>
-					{/if}
-				</div>
-			{:else}
-				<div class="pr-2">
-					<div>
-						<div class="bg-stone-700 flex gap-2 items-center rounded-xl px-2 my-2">
-							<IconoirSearch />
-							<input
-								type="text"
-								placeholder="Seach bosses..."
-								bind:value={searchBoss}
-								on:input={() => (bossList = searchBossesByName(bosses, searchBoss))}
-								class="bg-stone-700 w-full pr-2"
-							/>
-						</div>
-						<div class="overflow-auto h-[420px] pb-8 w-72 flex flex-col gap-2" id="scrollbox">
-							{#if bossList.length === 0}
-								<div>No bosses found</div>
-							{/if}
-							{#each bossList as boss}
-								<div>
-									<button
-										class="w-full text-left font-display leading-5 flex gap-1 align-top items-top"
-										on:click={() => setBoss(boss)}
-										>{#if boss.deathDate}
-											<div>
-												<IconoirCheckCircle />
-											</div>
-										{:else}
-											<div>
-												<IconoirCircle />
-											</div>
-										{/if}
-										{boss.name}
-									</button>
-								</div>
-							{/each}
-						</div>
-					</div>
-				</div>
-			{/if}
-		</ParentBox>
-	</div>
-	<div class="w-96 h-[524px] relative flex justify-center">
-		{#key currentBoss.id}
-			<div class="flex justify-center absolute">
+<div class="flex w-full h-full grow">
+	<div class="border-r-[1px] border-stone-700 px-2 w-80 md:flex flex-col hidden">
+		<div class="flex flex-col transition-all w-full gap-2 my-2">
+			<div class="flex items-center gap-2">
 				<div
-					in:fly={{
-						delay: 150,
-						duration: 1000,
-						easing: quintOut,
-						[$viewport == 'mobile' ? 'x' : 'y']: direction * 150
-					}}
-					out:fly={{
-						duration: 1000,
-						easing: quintOut,
-						[$viewport == 'mobile' ? 'x' : 'y']: direction * -1 * 150
-					}}
-					class="relative rounded-[48px] bg-stone-700 py-5 px-5 m-2 bg-opacity-[.30] w-full"
-					id="boxShadow"
+					class="bg-stone-900 border-stone-600 border-[1px] flex gap-2 items-center rounded-lg px-2 grow"
 				>
-					{#if auth}
-						<div
-							role="table"
-							class="flex absolute right-0 mr-8 mt-3"
-							on:mouseleave={() => closeOptions()}
-						>
-							{#if optionsVisible}
-								<div
-									transition:fade={{ duration: 100 }}
-									class="ml-5 flex flex-col gap-0 text-stone-800 bg-stone-200 hover:bg-stone-400 rounded-xl drop-shadow-md"
-								>
-									{#if currentBoss.deathDate}
-										<button
-											class="bg-stone-200 px-4 pt-1 rounded-t-xl border-solid border-2 border-b-0 border-stone-800 hover:bg-stone-400 transition-all"
-											on:click={() => toggleReviveModal()}>Revive Boss</button
-										>
-									{:else}
-										<div
-											class="bg-stone-600 px-4 pt-1 rounded-t-xl border-solid border-2 border-b-0 border-stone-800 transition-all"
-										>
-											Revive Boss
-										</div>
-									{/if}
-									<div
-										class="flex items-center justify-center border-solid border-2 border-y-0 border-stone-800"
-									>
-										<div class=" h-[1px] w-11/12 bg-stone-800" />
-									</div>
-									<button
-										class="bg-stone-200 px-4 pb-1 rounded-b-xl border-solid border-2 border-t-0 border-stone-800 hover:bg-stone-400 transition-all"
-										on:click={() => toggleSetDeathsModal()}
-									>
-										Set Deaths
-									</button>
+					<IconoirSearch />
+					<input
+						type="text"
+						placeholder="Seach bosses..."
+						bind:value={searchBoss}
+						on:input={() => (bossList = searchBossesByName(bosses, searchBoss))}
+						class="bg-stone-900 w-full pr-2"
+					/>
+				</div>
+			</div>
+			<div class="flex text-sm gap-1 justify-center text-center">
+				<button
+					class="grow border-stone-600 hover:bg-ember hover:border-ember duration-200 border-[1px] basis-1 rounded-lg px-1"
+					style={filter === 'all' ? 'background-color: #F05E1B; border-color: #F05E1B' : ''}
+					on:click={() => setFilter('all')}>All</button
+				>
+				<button
+					class="grow border-stone-600 hover:bg-ember hover:border-ember duration-200 border-[1px] basis-1 rounded-lg px-1"
+					style={filter === 'killed' ? 'background-color: #F05E1B; border-color: #F05E1B' : ''}
+					on:click={() => setFilter('killed')}>Killed</button
+				>
+				<button
+					class="grow border-stone-600 hover:bg-ember hover:border-ember duration-200 border-[1px] basis-1 rounded-lg px-1"
+					style={filter === 'not-killed' ? 'background-color: #F05E1B; border-color: #F05E1B' : ''}
+					on:click={() => setFilter('not-killed')}>Not Killed</button
+				>
+				<button
+					class="grow border-stone-600 hover:bg-ember hover:border-ember duration-200 border-[1px] basis-1 rounded-lg px-1"
+					style={filter === 'ongoing' ? 'background-color: #F05E1B; border-color: #F05E1B' : ''}
+					on:click={() => setFilter('ongoing')}>Ongoing</button
+				>
+			</div>
+			<div class="overflow-y-auto grow flex flex-col gap-1">
+				{#if bossList.length === 0}
+					<div>No bosses found</div>
+				{/if}
+				{#each bossList as boss}
+					<div>
+						<button
+							class="w-full text-left font-display leading-4 flex gap-1 align-top items-center truncate max-w-72 text-sm"
+							on:click={() => setBoss(boss)}
+							>{#if boss.deathDate}
+								<div>
+									<IconoirCheckCircle />
+								</div>
+							{:else}
+								<div>
+									<IconoirCircle />
 								</div>
 							{/if}
-							<div class="text-2xl">
-								<button on:click={() => toggleOptions()}>
-									<IconoirMoreHorizCircle />
-								</button>
+							<div
+								class={`${
+									boss.id === currentBoss.id ? 'text-[#FFA500]' : ''
+								} truncate hover:text-ember duration-200`}
+							>
+								{boss.name}
 							</div>
-						</div>
-					{/if}
-					<div class="flex flex-col gap-2 w-80">
-						<button on:click={() => goto(`/boss/${currentBoss.id}`)}>
-							<img alt="boss" class="w-48 h-48 mx-auto mt-4" src={currentBoss.bossImage} />
 						</button>
-						<button on:click={() => goto(`/boss/${currentBoss.id}`)}>
-							<div class="h-16 flex justify-center items-center">
-								<div class="font-display text-center text-2xl">
-									{currentBoss.name}
+					</div>
+				{/each}
+			</div>
+		</div>
+	</div>
+	<div class="flex flex-col grow px-2">
+		<button
+			class="flex absolute left-0 mt-4 border-stone-600 border-[1px] border-l-0 rounded-r-lg"
+			on:click={() => toggleBossList()}
+		>
+			<LetsIconsExpandRight class="w-10 h-10" />
+		</button>
+		{#key currentBoss.id}
+			<div class="mx-auto pt-4" in:fade={{ duration: 500 }}>
+				<div class="flex flex-col gap-4">
+					<div class="text-4xl font-title w-80 md:w-96 text-center mx-auto">
+						{currentBoss.name}
+					</div>
+					<div>
+						<div class="flex gap-2 text-xl items-center justify-center h-full">
+							<div
+								class="flex flex-col w-28 md:w-32 px-2 border-[1px] border-stone-600 bg-stone-800 rounded-lg"
+							>
+								<div class="">Deaths</div>
+								<div class="flex text-2xl md:text-3xl">
+									<div><MaterialSymbolsHeartBroken /></div>
+									<div class="grow" />
+									<div>{currentBoss.numRuns > 0 ? currentBoss.avgDeaths.toFixed(0) : '-'}</div>
 								</div>
 							</div>
-						</button>
-						<div class="text-5xl flex items-center justify-center align-middle gap-2">
-							<div class="flex-1 text-right font-title">{currentBoss.deaths}</div>
-							<div class="text-3xl"><IconoirXmark /></div>
-							<div class="flex-1"><MaterialSymbolsHeartBroken /></div>
+							<div
+								class="flex flex-col w-28 md:w-32 px-2 border-[1px] border-stone-600 bg-stone-800 rounded-lg"
+							>
+								<div class="text-xl">Difficulty</div>
+								<div class="flex text-2xl md:text-3xl">
+									<div><IconoirGym /></div>
+									<div class="grow" />
+									<div>
+										{currentBoss.numRatings ? currentBoss.avgDifficultyRating.toFixed(1) : '-'}
+									</div>
+								</div>
+							</div>
+							<div
+								class="flex flex-col w-28 md:w-32 px-2 border-[1px] border-stone-600 bg-stone-800 rounded-lg"
+							>
+								<div class="text-xl">Enjoyment</div>
+								<div class="flex text-2xl md:text-3xl">
+									<div><IconoirGym /></div>
+									<div class="grow" />
+									<div>
+										{currentBoss.numRatings ? currentBoss.avgEnjoymentRating.toFixed(1) : '-'}
+									</div>
+								</div>
+							</div>
 						</div>
-						{#key currentBoss}
-							<div class="flex align-middle items-center justify-center">
-								{#if !currentBoss.deathDate && auth}
-									<div>
-										<button
-											class="my-auto text-xs font-bold p-2 px-4 rounded-full text-stone-200 bg-red-800"
-											on:click={() => removeDeath(currentBoss)}>Remove Death</button
-										>
-									</div>
-									<div class="flex-grow" />
-									<div>
-										<button
-											class="text-xl p-4 px-6 rounded-full font-bold text-black bg-stone-200"
-											on:click={() => addDeath(currentBoss)}>Add Death</button
-										>
-									</div>
-								{:else}
-									<div class="text-3xl h-[116px] text-center flex flex-col justify-center">
+					</div>
+					<div class="relative">
+						{#if auth}
+							<div
+								role="table"
+								class="flex absolute right-0 mr-2 mt-2"
+								on:mouseleave={() => closeOptions()}
+							>
+								{#if optionsVisible}
+									<div
+										transition:fade={{ duration: 100 }}
+										class="ml-5 flex flex-col gap-0 text-stone-200 bg-stone-700 hover:bg-stone-400 rounded-xl drop-shadow-md"
+									>
 										{#if currentBoss.deathDate}
-											<div class="font-title flex-col" style="color: {currentBoss.killColour}">
-												{currentBoss.killText.toUpperCase()}
-											</div>
-											<div class="font-display opacity-40 text-sm">
-												{currentBoss.deathDateString}
+											<button
+												class="bg-stone-700 px-4 pt-1 rounded-t-xl border-solid border-2 border-b-0 border-stone-800 hover:ember transition-all"
+												on:click={() => toggleReviveModal()}>Revive Boss</button
+											>
+										{:else}
+											<div
+												class="bg-stone-900 px-4 pt-1 rounded-t-xl border-solid border-2 border-b-0 border-stone-800 transition-all"
+											>
+												Revive Boss
 											</div>
 										{/if}
+										<div
+											class="flex items-center justify-center border-solid border-2 border-y-0 border-stone-800"
+										>
+											<div class=" h-[1px] w-11/12 bg-stone-800" />
+										</div>
+										<button
+											class="bg-stone-200 px-4 pb-1 rounded-b-xl border-solid border-2 border-t-0 border-stone-800 hover:bg-stone-400 transition-all"
+											on:click={() => toggleSetDeathsModal()}
+										>
+											Set Deaths
+										</button>
 									</div>
 								{/if}
+								<div class="text-2xl">
+									<button on:click={() => toggleOptions()}>
+										<IconoirMoreHorizCircle />
+									</button>
+								</div>
 							</div>
-							{#if !currentBoss.deathDate && auth}
-								<button
-									class={'bg-black text-xl mt-2 -mx-5 -mb-5 p-4 rounded-b-[40px] font-bold'}
-									on:click={() => killBoss(currentBoss)}>Boss Killed</button
-								>
-							{/if}
-						{/key}
+						{/if}
+						<div
+							class="flex flex-col gap-4 bg-stone-800 rounded-lg p-2 border-stone-600 border-[1px]"
+						>
+							<div class="flex flex-wrap gap-4 justify-center">
+								<button on:click={() => goto(`/boss/${currentBoss.id}`)}>
+									<img alt="boss" class="w-64 h-64 mx-auto" src={currentBoss.bossImage} />
+								</button>
+								<div class="">
+									<div class="flex md:flex-col gap-2 text-xl items-center justify-center h-full">
+										<div class="flex flex-col w-28 md:w-32 px-2">
+											<div class="">Deaths</div>
+											<div class="flex text-2xl md:text-3xl">
+												<div><MaterialSymbolsHeartBroken /></div>
+												<div class="grow" />
+												<div
+													style={currentBoss.deaths
+														? `color: ${getStatColour(currentBoss.deaths, currentBoss.avgDeaths)}`
+														: ''}
+												>
+													{currentBoss.deaths.toFixed(0) ?? '-'}
+												</div>
+											</div>
+										</div>
+										<div class="flex flex-col w-28 md:w-32 px-2">
+											<div class="text-xl">Difficulty</div>
+											<div class="flex text-2xl md:text-3xl">
+												<div><IconoirGym /></div>
+												<div class="grow" />
+												<div
+													style={currentBoss.userDifficultyRating
+														? `color: ${getStatColour(
+																currentBoss.avgDifficultyRating,
+																currentBoss.userDifficultyRating
+														  )}`
+														: ''}
+												>
+													{currentBoss.userDifficultyRating || '-'}
+												</div>
+											</div>
+										</div>
+										<div class="flex flex-col w-28 md:w-32 px-2">
+											<div class="text-xl">Enjoyment</div>
+											<div class="flex text-2xl md:text-3xl">
+												<div><IconoirGym /></div>
+												<div class="grow" />
+												<div
+													style={currentBoss.userEnjoymentRating
+														? `color: ${getStatColour(
+																currentBoss.avgEnjoymentRating,
+																currentBoss.userEnjoymentRating
+														  )}`
+														: ''}
+												>
+													{currentBoss.userEnjoymentRating || '-'}
+												</div>
+											</div>
+										</div>
+									</div>
+								</div>
+							</div>
+
+							{#key currentBoss}
+								<div class="flex align-middle items-center justify-center">
+									{#if !currentBoss.deathDate && auth}
+										<div class="flex flex-col gap-2">
+											<div class="flex gap-8 justify-center items-center">
+												<button
+													class="py-1 w-32 border-stone-400 hover:bg-ember hover:border-ember border-[1px] rounded-lg flex items-center justify-center duration-200"
+													on:click={() => removeDeath(currentBoss)}>Remove Death</button
+												>
+												<button
+													class="py-1 w-32 border-stone-400 hover:bg-ember hover:border-ember border-[1px] rounded-lg duration-200"
+													on:click={() => addDeath(currentBoss)}>Add Death</button
+												>
+											</div>
+										</div>
+									{:else}
+										<div class="text-3xl h-[116px] text-center flex flex-col justify-center">
+											{#if currentBoss.deathDate}
+												<div class="font-title flex-col" style="color: {currentBoss.killColour}">
+													{currentBoss.killText.toUpperCase()}
+												</div>
+												<div class="font-display opacity-40 text-sm">
+													{currentBoss.deathDateString}
+												</div>
+											{/if}
+										</div>
+									{/if}
+								</div>
+								{#if !currentBoss.deathDate && auth}
+									<div class="flex justify-center">
+										<button
+											class="border-[1px] border-stone-400 hover:bg-ember hover:border-ember w-40 rounded-lg py-2 duration-200 text-xl"
+											on:click={() => killBoss(currentBoss)}>Boss Killed</button
+										>
+									</div>
+								{/if}
+							{/key}
+						</div>
 					</div>
 				</div>
 			</div>
 		{/key}
-	</div>
-	<div class="flex-none">
-		<ParentBox>
-			<div class="flex flex-col">
-				<img
-					src={user.profilePicture}
-					class="w-56 h-56 rounded-full p-10"
-					alt="profile"
-					referrerpolicy="no-referrer"
-				/>
-				<div class="m-2 flex flex-col">
-					<div class="flex gap-2 items-center">
-						<IconoirUser />
-						<button
-							on:click|stopPropagation={() => goto(`/user/${run.userId}`)}
-							class="opacity-60 items-center hover:text-stone-400 duration-200"
-						>
-							<div>{user.displayName}</div>
-						</button>
-					</div>
-					<div class="flex gap-2 items-center">
-						<IconoirGamepad />
-						<div class="opacity-60">{run.gameTitle}</div>
-					</div>
-					<div class="flex gap-2 items-center">
-						<IconoirClock />
-						<div class="opacity-60">{run.startDateString}</div>
-					</div>
-					<div class="flex gap-2 items-center">
-						<IconoirGym />
-						{#key currentBoss}
-							<div class="opacity-60">{truncateString(getLatestBoss().name)}</div>
-						{/key}
-					</div>
-					<div class="flex h-5 items-top">
-						{#key copyState}
-							<div
-								class="absolute"
-								in:fade={{ delay: 105, duration: 300 }}
-								out:fade={{ duration: 100 }}
-							>
-								{#if copyState === 'normal'}
-									<button
-										class="flex gap-2 items-center"
-										on:click={() => copyToClipboard(run.name)}
-									>
-										<IconoirShareAndroid />
-										<div class="transition-all opacity-60">{run.name}</div>
-									</button>
-								{:else if copyState === 'copied'}
-									<button class="flex gap-1 items-center">
-										<IconoirCheck />
-										<div class="transition-all" style="opacity: 1">Copied!</div>
-									</button>
-								{/if}
-							</div>
-						{/key}
-					</div>
-					<div class="mt-4 flex justify-center">
-						<button
-							class="bg-stone-200 text-black rounded-full py-1 px-4 text-center hover:bg-stone-400 duration-200"
-							on:click={() => goto(`/runs/${run.id}/report`)}
-						>
-							Generate Run Report
-						</button>
-					</div>
-				</div>
-			</div></ParentBox
-		>
+		<div>
+			<div>Run Report</div>
+		</div>
 	</div>
 </div>
 {#if reviveModalVisible}
@@ -625,6 +654,94 @@
 					<div class="bg-black text-stone-200 p-2 rounded-full">Submit</div>
 				</button>
 				<div class="h-4 text-red-800 text-md">{errorText}</div>
+			</div>
+		</div>
+	</div>
+{/if}
+{#if bossListOpen}
+	<div
+		transition:fade={{ duration: 200 }}
+		id="backdrop"
+		class="fixed top-0 w-screen cursor-default h-screen"
+		on:click|self={() => toggleBossList()}
+		on:keypress={(e) => e.key === 'Escape' && toggleBossList()}
+		tabindex="0"
+		role="button"
+	>
+		<div
+			transition:fly={{ x: -1000, duration: 500 }}
+			class="absolute opacity-100 inset-y-0 top-0 h-screen bg-stone-900 px-2 text-stone-200 overflow-y-auto"
+		>
+			<div class="w-80 flex flex-col">
+				<div class="flex flex-col transition-all w-full gap-2 my-2">
+					<div class="flex items-center gap-2">
+						<div
+							class="bg-stone-900 border-stone-600 border-[1px] flex gap-2 items-center rounded-lg px-2 grow"
+						>
+							<IconoirSearch />
+							<input
+								type="text"
+								placeholder="Seach bosses..."
+								bind:value={searchBoss}
+								on:input={() => (bossList = searchBossesByName(bosses, searchBoss))}
+								class="bg-stone-900 w-full pr-2"
+							/>
+						</div>
+					</div>
+					<div class="flex text-sm gap-1 justify-center text-center">
+						<button
+							class="grow border-stone-600 hover:bg-ember hover:border-ember duration-200 border-[1px] basis-1 rounded-lg px-1"
+							style={filter === 'all' ? 'background-color: #F05E1B; border-color: #F05E1B' : ''}
+							on:click={() => setFilter('all')}>All</button
+						>
+						<button
+							class="grow border-stone-600 hover:bg-ember hover:border-ember duration-200 border-[1px] basis-1 rounded-lg px-1"
+							style={filter === 'killed' ? 'background-color: #F05E1B; border-color: #F05E1B' : ''}
+							on:click={() => setFilter('killed')}>Killed</button
+						>
+						<button
+							class="grow border-stone-600 hover:bg-ember hover:border-ember duration-200 border-[1px] basis-1 rounded-lg px-1"
+							style={filter === 'not-killed'
+								? 'background-color: #F05E1B; border-color: #F05E1B'
+								: ''}
+							on:click={() => setFilter('not-killed')}>Not Killed</button
+						>
+						<button
+							class="grow border-stone-600 hover:bg-ember hover:border-ember duration-200 border-[1px] basis-1 rounded-lg px-1"
+							style={filter === 'ongoing' ? 'background-color: #F05E1B; border-color: #F05E1B' : ''}
+							on:click={() => setFilter('ongoing')}>Ongoing</button
+						>
+					</div>
+					<div class="grow flex flex-col gap-1">
+						{#if bossList.length === 0}
+							<div>No bosses found</div>
+						{/if}
+						{#each bossList as boss}
+							<div>
+								<button
+									class="w-full text-left font-display leading-4 flex gap-1 align-top items-center truncate max-w-72 text-sm"
+									on:click={() => setBoss(boss)}
+									>{#if boss.deathDate}
+										<div>
+											<IconoirCheckCircle />
+										</div>
+									{:else}
+										<div>
+											<IconoirCircle />
+										</div>
+									{/if}
+									<div
+										class={`${
+											boss.id === currentBoss.id ? 'text-[#FFA500]' : ''
+										} truncate hover:text-ember duration-200`}
+									>
+										{boss.name}
+									</div>
+								</button>
+							</div>
+						{/each}
+					</div>
+				</div>
 			</div>
 		</div>
 	</div>
