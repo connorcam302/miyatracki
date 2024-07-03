@@ -15,6 +15,7 @@
 	import IconoirXmark from 'virtual:icons/iconoir/xmark';
 	import IconoirRunning from 'virtual:icons/iconoir/running';
 	import IconoirBonfire from 'virtual:icons/iconoir/bonfire';
+	import IconoirSearch from 'virtual:icons/iconoir/search';
 	import { fade, fly } from 'svelte/transition';
 	import { setContext } from 'svelte';
 	import { writable } from 'svelte/store';
@@ -78,6 +79,42 @@
 		visible = false;
 		goto(destination);
 	};
+
+	$: searchTerms = '';
+	$: searchResults = null;
+	$: showSearchResults = false;
+	const search = async (searchTerms) => {
+		if (searchTerms.length < 3) {
+			searchResults = null;
+			showSearchResults = false;
+			return;
+		}
+		showSearchResults = true;
+		const results = await fetch(`/api/search/${searchTerms}`)
+			.then((res) => res.json())
+			.then((data) => data.data);
+
+		searchResults = results;
+		return;
+	};
+
+	const searchNavigate = (destination) => {
+		searchTerms = '';
+		searchResults = null;
+		visible = false;
+		goto(destination);
+	};
+
+	const closeSearch = () => {
+		//wait for the click event to finish before closing the search
+		setTimeout(() => {
+			showSearchResults = false;
+		}, 100);
+	};
+
+	$: searchTerms && search(searchTerms);
+	$: console.log(searchResults);
+	$: console.log(showSearchResults);
 </script>
 
 <svelte:window bind:innerWidth bind:innerHeight />
@@ -96,6 +133,93 @@
 								class="mr-3 text-4xl font-bold font-display"
 								on:click={() => mobileNavigate('/')}>miyatracki</button
 							>
+						{/key}
+					</div>
+				</div>
+				<div class="hidden md:flex items-center gap-2 grow justify-center">
+					<div class="flex flex-col w-full max-w-screen-sm relative">
+						<div
+							class="bg-stone-900 border-stone-600 border-[1px] flex gap-2 items-center rounded-lg px-2 grow text-xl max-w-screen-sm h-10"
+						>
+							<IconoirSearch />
+							<input
+								type="text"
+								placeholder="Search..."
+								bind:value={searchTerms}
+								on:blur={closeSearch}
+								on:focus={() => (showSearchResults = true)}
+								class="bg-stone-900 w-full pr-2"
+							/>
+						</div>
+						{#key searchResults}
+							{#if showSearchResults && searchResults && [...searchResults.run, ...searchResults.user, ...searchResults.boss, ...searchResults.game].length > 0}
+								<div
+									class="absolute top-full left-0 right-0 mt-2 bg-stone-900 border-[1px] border-stone-600 rounded-lg shadow-lg z-10 px-2"
+								>
+									<div class="flex flex-col gap-2 pb-2">
+										{#if searchResults.run.length > 1}
+											<div class="text-xl py-1">Runs</div>
+											<ul class="px-2">
+												{#each searchResults.run as run}
+													<li>
+														<button
+															class="hover:bg-ember duration-100 cursor-pointer text-base px-1 w-full text-left"
+															on:click={() => searchNavigate(`/runs/${run.runId}`)}
+														>
+															{run.runName}
+														</button>
+													</li>
+												{/each}
+											</ul>
+										{/if}
+										{#if searchResults.user.length > 0}
+											<div class="text-xl py-1">Users</div>
+											<ul class="px-2">
+												{#each searchResults.user as user}
+													<li>
+														<button
+															class="hover:bg-ember duration-100 cursor-pointer text-base px-1 w-full text-left"
+															on:click={() => searchNavigate(`/user/${user.id}`)}
+														>
+															{user.displayName}
+														</button>
+													</li>
+												{/each}
+											</ul>
+										{/if}
+										{#if searchResults.boss.length > 0}
+											<div class="text-xl py-1">Bosses</div>
+											<ul class="px-2">
+												{#each searchResults.boss as boss}
+													<li>
+														<button
+															class="hover:bg-ember duration-100 cursor-pointer text-base px-1 w-full text-left"
+															on:click={() => searchNavigate(`/boss/${boss.bossId}`)}
+														>
+															{boss.bossName}
+														</button>
+													</li>
+												{/each}
+											</ul>
+										{/if}
+										{#if searchResults.game.length > 0}
+											<div class="text-xl py-1">Games</div>
+											<ul class="px-2">
+												{#each searchResults.game as game}
+													<li>
+														<button
+															class="hover:bg-ember duration-100 cursor-pointer text-base px-1 w-full text-left"
+															on:click={() => searchNavigate(`/games/${game.gameId}`)}
+														>
+															{game.gameTitle}
+														</button>
+													</li>
+												{/each}
+											</ul>
+										{/if}
+									</div>
+								</div>
+							{/if}
 						{/key}
 					</div>
 				</div>
@@ -286,7 +410,7 @@
 	>
 		<div
 			transition:fly={{ x: -1000, duration: 500 }}
-			class="absolute opacity-100 inset-y-0 top-0 h-screen w-72 bg-stone-900  p-4 text-stone-200"
+			class="absolute opacity-100 inset-y-0 top-0 h-screen w-72 bg-stone-900 p-4 text-stone-200"
 		>
 			<div class="text-3xl w-full h-full max-h-screen overflow-auto">
 				<div class="flex items-center align-middle border-b-[1px] border-stone-700 pb-2">
@@ -312,6 +436,93 @@
 						</button>
 						<button on:click={() => mobileNavigate('/auth')} class="my-auto text-2xl">Login</button>
 					{/if}
+				</div>
+				<div class="flex items-center gap-2 grow justify-center">
+					<div class="flex flex-col w-full max-w-screen-sm relative">
+						<div
+							class="bg-stone-900 border-stone-600 border-[1px] flex gap-2 items-center rounded-lg px-2 grow text-xl max-w-screen-sm h-10"
+						>
+							<IconoirSearch />
+							<input
+								type="text"
+								placeholder="Search..."
+								bind:value={searchTerms}
+								on:blur={closeSearch}
+								on:focus={() => (showSearchResults = true)}
+								class="bg-stone-900 w-full pr-2"
+							/>
+						</div>
+						{#key searchResults}
+							{#if showSearchResults && searchResults && [...searchResults.run, ...searchResults.user, ...searchResults.boss, ...searchResults.game].length > 0}
+								<div
+									class="absolute top-full left-0 right-0 mt-2 bg-stone-900 border-[1px] border-stone-600 rounded-lg shadow-lg z-10 px-2"
+								>
+									<div class="flex flex-col gap-2 pb-2">
+										{#if searchResults.run.length > 1}
+											<div class="text-xl py-1">Runs</div>
+											<ul class="px-2">
+												{#each searchResults.run as run}
+													<li>
+														<button
+															class="hover:bg-ember duration-100 cursor-pointer text-base px-1 w-full text-left"
+															on:click={() => searchNavigate(`/runs/${run.runId}`)}
+														>
+															{run.runName}
+														</button>
+													</li>
+												{/each}
+											</ul>
+										{/if}
+										{#if searchResults.user.length > 0}
+											<div class="text-xl py-1">Users</div>
+											<ul class="px-2">
+												{#each searchResults.user as user}
+													<li>
+														<button
+															class="hover:bg-ember duration-100 cursor-pointer text-base px-1 w-full text-left"
+															on:click={() => searchNavigate(`/user/${user.id}`)}
+														>
+															{user.displayName}
+														</button>
+													</li>
+												{/each}
+											</ul>
+										{/if}
+										{#if searchResults.boss.length > 0}
+											<div class="text-xl py-1">Bosses</div>
+											<ul class="px-2">
+												{#each searchResults.boss as boss}
+													<li>
+														<button
+															class="hover:bg-ember duration-100 cursor-pointer text-base px-1 w-full text-left"
+															on:click={() => searchNavigate(`/boss/${boss.bossId}`)}
+														>
+															{boss.bossName}
+														</button>
+													</li>
+												{/each}
+											</ul>
+										{/if}
+										{#if searchResults.game.length > 0}
+											<div class="text-xl py-1">Games</div>
+											<ul class="px-2">
+												{#each searchResults.game as game}
+													<li>
+														<button
+															class="hover:bg-ember duration-100 cursor-pointer text-base px-1 w-full text-left"
+															on:click={() => searchNavigate(`/games/${game.gameId}`)}
+														>
+															{game.gameTitle}
+														</button>
+													</li>
+												{/each}
+											</ul>
+										{/if}
+									</div>
+								</div>
+							{/if}
+						{/key}
+					</div>
 				</div>
 				<div class="text-lg">
 					{#if session && userData}
