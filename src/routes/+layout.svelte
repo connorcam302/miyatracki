@@ -94,6 +94,8 @@
 			.then((res) => res.json())
 			.then((data) => data.data);
 
+		console.log(searchResults);
+
 		searchResults = results;
 		return;
 	};
@@ -113,8 +115,6 @@
 	};
 
 	$: searchTerms && search(searchTerms);
-	$: console.log(searchResults);
-	$: console.log(showSearchResults);
 </script>
 
 <svelte:window bind:innerWidth bind:innerHeight />
@@ -179,7 +179,7 @@
 													<li>
 														<button
 															class="hover:bg-ember duration-100 cursor-pointer text-base px-1 w-full text-left"
-															on:click={() => searchNavigate(`/user/${user.id}`)}
+															on:click={() => searchNavigate(`/user/${user.userId}`)}
 														>
 															{user.displayName}
 														</button>
@@ -271,7 +271,7 @@
 		</div>
 	{/if}
 	{#key data.url}
-		<div class="grow flex" in:fade={{ delay: 120, duration: 250 }}>
+		<div class="grow flex">
 			<div class="text-stone-300">
 				<div class="hidden md:flex flex-col h-full">
 					{#if session && userData}
@@ -325,12 +325,12 @@
 							<button
 								on:click={() => goto('/games/4')}
 								class="truncate transition duration-200 hover:text-ember text-left"
-								>Bloodborne</button
+								>Dark Souls III</button
 							>
 							<button
 								on:click={() => goto('/games/5')}
 								class="truncate transition duration-200 hover:text-ember text-left"
-								>Dark Souls III</button
+								>Bloodborne</button
 							>
 							<button
 								on:click={() => goto('/games/6')}
@@ -393,7 +393,9 @@
 					</div>
 				</div>
 			</div>
-			<slot />
+			<div class="w-full h-full" in:fade={{ delay: 120, duration: 250 }}>
+				<slot />
+			</div>
 		</div>
 	{/key}
 </div>

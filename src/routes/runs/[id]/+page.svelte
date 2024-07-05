@@ -1,23 +1,19 @@
 <script lang="ts">
 	export let data;
-	import ParentBox from '$lib/components/ParentBox.svelte';
 	import IconoirSearch from 'virtual:icons/iconoir/search';
-	import IconoirCheck from 'virtual:icons/iconoir/check';
-	import IconoirShareAndroid from 'virtual:icons/iconoir/share-android';
 	import IconoirUser from 'virtual:icons/iconoir/user';
 	import IconoirGamepad from 'virtual:icons/iconoir/gamepad';
 	import IconoirClock from 'virtual:icons/iconoir/clock';
 	import IconoirGym from 'virtual:icons/iconoir/gym';
 	import MaterialSymbolsHeartBroken from 'virtual:icons/material-symbols/heart-broken';
-	import LetsIconsExpandLeft from '~icons/lets-icons/expand-left';
 	import LetsIconsExpandRight from '~icons/lets-icons/expand-right';
-	import IconoirXmark from 'virtual:icons/iconoir/xmark';
 	import IconoirCircle from 'virtual:icons/iconoir/circle';
 	import IconoirCheckCircle from 'virtual:icons/iconoir/check-circle';
 	import IconoirMoreHorizCircle from '~icons/iconoir/more-horiz-circle';
-
+	import Chart from 'chart.js/auto';
 	import IconoirGraphUp from 'virtual:icons/iconoir/graph-up';
 	import IconoirMagicWand from 'virtual:icons/iconoir/magic-wand';
+	import RunChart from './RunChart.svelte';
 	import tippy from 'sveltejs-tippy';
 	import dayjs from 'dayjs';
 	import advancedFormat from 'dayjs/plugin/advancedFormat';
@@ -26,7 +22,7 @@
 	import { getTimeSinceEpoch, getDateString, getExperienceTitle } from '$lib/functions';
 	import { page } from '$app/stores';
 	import { goto } from '$app/navigation';
-	import { getContext, onMount } from 'svelte';
+	import { getContext, onMount, onDestroy } from 'svelte';
 
 	const { run, bosses, user, userData } = data;
 	$: viewport = getContext('viewport');
@@ -34,11 +30,18 @@
 	let urlBoss = Number($page.url.searchParams.get('boss'));
 
 	$: runReport = null;
+	let chart;
+	let canvas;
 	onMount(() => {
 		loadRunReport();
+		loadLeaderboard();
 	});
 
-	$: console.log(runReport);
+	onDestroy(() => {
+		if (chart) {
+			chart.destroy();
+		}
+	});
 
 	$: runData = null;
 	$: reports = null;
@@ -55,14 +58,31 @@
 		}
 	};
 
+	const toggleRunReport = () => {
+		runReportOpen = !runReportOpen;
+		toggleBossList();
+	};
+
+	const loadLeaderboard = async () => {
+		leaderboard = null;
+		const leaderboardData = await fetch(`/api/boss/${currentBoss.id}/leaderboard`).then((res) =>
+			res.json().then((data) => data.data)
+		);
+
+		leaderboard = leaderboardData;
+	};
 	let currentBoss = bossList[0];
+	let runReportOpen = false;
 	if (urlBoss) {
 		const searchBoss = bossList.find((boss) => boss.id === urlBoss);
 		if (searchBoss === undefined) {
+			runReportOpen = true;
 			currentBoss = bossList[0];
 		} else {
 			currentBoss = searchBoss;
 		}
+	} else {
+		runReportOpen = true;
 	}
 
 	let searchBoss = '';
@@ -83,8 +103,8 @@
 	const auth = setAuth(user.id, userData?.id ?? null);
 
 	let direction = '1';
-
-	const setBoss = (boss) => {
+	$: leaderboard = null;
+	const setBoss = async (boss) => {
 		runReportOpen = false;
 		if (boss.id > currentBoss.id) {
 			direction = '1';
@@ -92,8 +112,10 @@
 			direction = '-1';
 		}
 		bossListOpen = false;
+		leaderboard = null;
 
 		currentBoss = boss;
+		loadLeaderboard();
 		$page.url.searchParams.set('boss', boss.id);
 		goto(`?${$page.url.searchParams.toString()}`);
 	};
@@ -153,29 +175,6 @@
 			console.log('something went wrong');
 			console.log(await response.json());
 		}
-	};
-
-	const getLatestBoss = () => {
-		// Check if all timestamps are null
-		const allTimestampsNull = bosses.every((boss) => boss.deathDate === null);
-
-		if (allTimestampsNull) {
-			return { name: 'No Bosses Killed' };
-		}
-
-		// If not all timestamps are null, find the boss with the latest death date
-		const bossWithLatestDeathDate = bosses.reduce((maxDeathDateBoss, currentBoss) => {
-			const maxDeathDate = maxDeathDateBoss ? new Date(maxDeathDateBoss.deathDate) : null;
-			const currentDeathDate = currentBoss.deathDate ? new Date(currentBoss.deathDate) : null;
-
-			if (!maxDeathDate || (currentDeathDate && currentDeathDate > maxDeathDate)) {
-				return currentBoss;
-			} else {
-				return maxDeathDateBoss;
-			}
-		}, null);
-
-		return bossWithLatestDeathDate;
 	};
 
 	$: optionsVisible = false;
@@ -293,12 +292,6 @@
 		if (stat > averageStat) return '#ef4444';
 		if (stat < averageStat) return '#22c55e';
 	};
-
-	$: runReportOpen = true;
-	const toggleRunReport = () => {
-		runReportOpen = !runReportOpen;
-		toggleBossList();
-	};
 </script>
 
 <div class="flex w-full">
@@ -393,10 +386,10 @@
 								<div>
 									<div class="flex gap-2 text-xl items-center justify-center h-full">
 										<div
-											class="flex flex-col w-28 md:w-32 px-2 border-[1px] border-stone-600 bg-stone-800 rounded-lg"
+											class="flex flex-col w-28 md:w-full px-2 border-[1px] border-stone-600 bg-stone-800 rounded-lg py-1"
 										>
 											<div class="">Deaths</div>
-											<div class="flex text-2xl md:text-3xl">
+											<div class="flex text-2xl">
 												<div><MaterialSymbolsHeartBroken /></div>
 												<div class="grow" />
 												<div>
@@ -405,11 +398,12 @@
 											</div>
 										</div>
 										<div
-											class="flex flex-col w-28 md:w-32 px-2 border-[1px] border-stone-600 bg-stone-800 rounded-lg"
+											class="flex flex-col w-28 md:w-full px-2 border-[1px] border-stone-600 bg-stone-800 rounded-lg py-1"
 										>
 											<div class="text-xl">Difficulty</div>
-											<div class="flex text-2xl md:text-3xl">
+											<div class="flex text-2xl">
 												<div><IconoirGym /></div>
+
 												<div class="grow" />
 												<div>
 													{currentBoss.numRatings
@@ -419,10 +413,10 @@
 											</div>
 										</div>
 										<div
-											class="flex flex-col w-28 md:w-32 px-2 border-[1px] border-stone-600 bg-stone-800 rounded-lg"
+											class="flex flex-col w-28 md:w-full px-2 border-[1px] border-stone-600 bg-stone-800 rounded-lg py-1"
 										>
 											<div class="text-xl">Enjoyment</div>
-											<div class="flex text-2xl md:text-3xl">
+											<div class="flex text-2xl">
 												<div><IconoirGym /></div>
 												<div class="grow" />
 												<div>
@@ -432,7 +426,6 @@
 										</div>
 									</div>
 								</div>
-								runs
 								<div class="relative">
 									{#if auth}
 										<div
@@ -589,6 +582,36 @@
 						</div>
 					{/key}
 				</div>
+				{#key leaderboard}
+					{#if leaderboard !== null}
+						<div class="flex flex-col gap-2">
+							<div class="px-2 md:px-4 text-3xl">Leaderboard</div>
+							<div
+								class="flex flex-col gap-2 justify-center text-stone-200 bg-stone-800 rounded-lg p-2 border-stone-600 border-[1px]"
+							>
+								<table>
+									{#each leaderboard as entry, i}
+										<tr
+											class={`${
+												i !== leaderboard.length - 1 ? 'border-b-[1px] border-stone-600' : ''
+											}`}
+										>
+											<td class="pl-2 text-left">{i + 1}</td>
+											<td class="truncate max-w-72 min-w-72"
+												><button
+													class="text-left truncate hover:text-stone-400 duration-200"
+													on:click={() => goto(`/runs/${entry.id}?boss=${currentBoss.id}`)}
+													>{entry.name}</button
+												></td
+											>
+											<td class="text-right pr-2">{entry.deaths}</td>
+										</tr>
+									{/each}
+								</table>
+							</div>
+						</div>
+					{/if}
+				{/key}
 			{:else if runData && reports}
 				<div>
 					<div>
@@ -710,6 +733,7 @@
 						</div>
 					</div>
 				</div>
+				<RunChart {bosses} />
 			{/if}
 		</div>
 	{/key}

@@ -109,7 +109,7 @@
 			{/each}
 		</div>
 	</div>
-	<div class="flex flex-wrap gap-4 justify-center">
+	<div class="flex flex-wrap gap-4 md:gap-8 justify-center">
 		<div class="flex flex-col gap-4 px-2 md:px-4 max-w-96">
 			<div class="px-2 md:px-4 text-3xl">Updates</div>
 			<div class="flex flex-col gap-2 justify-center">
@@ -123,7 +123,7 @@
 							</div>
 						{:else}
 							<div
-								class="flex flex-wrap gap-4 justify-center md:justify-start w-full overflow-hidden"
+								class="flex flex-col gap-4 justify-center md:justify-start w-full overflow-hidden"
 							>
 								{#each runs.length == limit + 1 ? runs.slice(0, -1) : runs as run, i}
 									{#key run.runId + run.bossName}
@@ -250,7 +250,12 @@
 					{#each bossRankings as boss, i}
 						<tr class={`${i !== 31 ? 'border-b-[1px] border-stone-600' : ''}`}>
 							<td class="pr-3 text-right">{i + 1}</td>
-							<td class="truncate max-w-72 min-w-72">{boss.bossName}</td>
+							<td class="truncate max-w-72 min-w-72"
+								><button
+									class="text-left truncate hover:text-stone-400 duration-200"
+									on:click={() => goto(`/boss/${boss.bossId}`)}>{boss.bossName}</button
+								></td
+							>
 							<td>{boss.combinedAverageRating.toFixed(0)}</td>
 						</tr>
 					{/each}
@@ -266,7 +271,12 @@
 					{#each bossAverageDeaths as boss, i}
 						<tr class={`${i !== 31 ? 'border-b-[1px] border-stone-600' : ''}`}>
 							<td class="pr-3 text-right">{i + 1}</td>
-							<td class="truncate max-w-72 min-w-72">{boss.bossName}</td>
+							<td class="w-64 overflow-hidden flex px-2 pr-3">
+								<button
+									class="text-left truncate hover:text-stone-400 duration-200"
+									on:click={() => goto(`/boss/${boss.bossId}`)}>{boss.bossName}</button
+								></td
+							>
 							<td>{Number(boss.avgDeaths).toFixed(0)}</td>
 						</tr>
 					{/each}

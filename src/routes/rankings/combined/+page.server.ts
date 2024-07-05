@@ -9,12 +9,13 @@ import {
 import { avg, count, desc, eq, sql } from 'drizzle-orm';
 
 export const load = async ({ fetch, data, params }) => {
-	const [game] = await db.select().from(gamesTable).where(eq(gamesTable.gameId, params.id));
+	const games = await db.select().from(gamesTable);
 
 	const bosses = await db
 		.select({
 			bossId: bossesTable.bossId,
 			bossName: bossesTable.bossName,
+			bossGame: bossesTable.bossGame,
 			avgEnjoymentRating: avg(bossRatingsTable.enjoymentRating),
 			avgDifficultyRating: avg(bossRatingsTable.difficultyRating),
 			avgDeaths: avg(bossDeathsInRunTable.deathCount),
@@ -27,10 +28,14 @@ export const load = async ({ fetch, data, params }) => {
 		.leftJoin(bossRatingsTable, eq(bossesTable.bossId, bossRatingsTable.bossId))
 		.leftJoin(bossDeathsInRunTable, eq(bossesTable.bossId, bossDeathsInRunTable.bossId))
 		.leftJoin(runsTable, eq(bossDeathsInRunTable.runId, runsTable.runId))
-		.groupBy(bossesTable.bossId, bossesTable.bossName)
-		.where(eq(bossesTable.bossGame, params.id));
+		.groupBy(bossesTable.bossId, bossesTable.bossName);
 
-	const allRuns = await db.select().from(runsTable).where(eq(runsTable.gameId, params.id));
+	const bossByGame = games.map((game) => {
+		return {
+			gameName: game.gameTitle,
+			bosses: bosses.filter((boss) => boss.bossGame === game.gameId)
+		};
+	});
 
-	return { game, bosses, allRuns };
+	return { bossByGame };
 };
