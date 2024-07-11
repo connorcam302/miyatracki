@@ -206,3 +206,14 @@ export const getKillButtonInfo = (bossId: number) => {
 export const truncateString = (str, maxlength = 20) => {
 	return str.length > maxlength ? `${str.slice(0, maxlength)}...` : str;
 };
+/**
+ * Returns the colour of the stat based on the average stat.
+ * @param stat The stat to compare.
+ * @param averageStat The average stat to compare against.
+ * @returns The colour of the stat.
+ */
+export const getStatColour = (stat: number, averageStat: number) => {
+	if (stat === averageStat) return '#e7e5e4';
+	if (stat > averageStat) return '#ef4444';
+	if (stat < averageStat) return '#22c55e';
+};

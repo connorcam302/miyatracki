@@ -15,7 +15,7 @@
 	import IconoirMagicWand from 'virtual:icons/iconoir/magic-wand';
 	import MaterialSymbolsHeartBroken from 'virtual:icons/material-symbols/heart-broken';
 	import ChildBox from '$lib/components/ChildBox.svelte';
-	import { browser } from '$app/environment';
+	import { fly } from 'svelte/transition';
 	import { onMount } from 'svelte';
 	import { getExperienceTitle, truncateString } from '$lib/functions.js';
 	import dayjs from 'dayjs';
@@ -36,7 +36,8 @@
 	}
 
 	export let data;
-	const { userData, bossRankings, bossAverageDeaths } = data;
+	const { userData, bossRankings, bossDeaths, games } = data;
+	console.log(data);
 
 	$: pageNumber = 1;
 	const limit = 5;
@@ -64,11 +65,73 @@
 		pageNumber--;
 		loadUpdates();
 	};
+
+	const experienceDescription = new Map();
+	experienceDescription.set(0, 'Your first playthrough of any souls-like game.');
+	experienceDescription.set(1, 'Your first playthrough of this game.');
+	experienceDescription.set(2, 'You have played this game once before.');
+	experienceDescription.set(3, 'You have played this game multiple times before.');
+
+	let nameValue;
+	let experienceValue = 0;
+	let gameValue = 'Select a Game';
+	let error = '';
+
+	const handleSubmit = async () => {
+		if (
+			nameValue === undefined ||
+			nameValue === null ||
+			nameValue.length < 3 ||
+			nameValue.length > 50
+		) {
+			error = 'Please enter a name between 3 and 50 characters.';
+			return;
+		}
+		if (gameValue === 'Select a Game') {
+			error = 'Please select a game.';
+			return;
+		}
+		if (userData === null || userData.id === null || userData.id === undefined) {
+			error = 'Please log in to create a run.';
+			return;
+		}
+		error = '';
+		const formData = {
+			id: userData.id,
+			name: nameValue,
+			game: gameValue,
+			experience: experienceValue
+		};
+
+		const data = Object.keys(formData)
+			.map((key) => encodeURIComponent(key) + '=' + encodeURIComponent(formData[key]))
+			.join('&');
+
+		fetch(`/api/runs/new?${data}`, {
+			method: 'POST'
+		})
+			.then((res) => {
+				if (res.status === 200) {
+					res.json().then((data) => {
+						goto(`/runs/${data.data[0][0].runId}`);
+					});
+				}
+			})
+			.catch((err) => {
+				error = 'error';
+				console.log(err);
+			});
+	};
+
+	let visible = false;
+	function toggleVisible() {
+		visible = !visible;
+	}
 </script>
 
 <div class="flex flex-col gap-4 mx-auto">
 	<div class="py-4 flex flex-col gap-4 px-4 items-center">
-		<div class="px-2 md:px-4 flex gap-4 w-full">
+		<div class="px-2 md:px-4 flex gap-4 w-full items-center">
 			<div class="text-3xl">Your Runs</div>
 		</div>
 		<div class="flex flex-wrap gap-4 justify-center items-center">
@@ -107,6 +170,11 @@
 					</div>
 				</button>
 			{/each}
+			<button
+				on:click={() => toggleVisible()}
+				class="text-2xl rounded-lg hover:bg-ember hover:border-ember border-[1px] border-stone-600 py-1 px-4 duration-200"
+				>New Run</button
+			>
 		</div>
 	</div>
 	<div class="flex flex-wrap gap-4 md:gap-8 justify-center">
@@ -256,19 +324,19 @@
 									on:click={() => goto(`/boss/${boss.bossId}`)}>{boss.bossName}</button
 								></td
 							>
-							<td>{boss.combinedAverageRating.toFixed(0)}</td>
+							<td>{boss.combinedRating.toFixed(0)}</td>
 						</tr>
 					{/each}
 				</table>
 			</div>
 		</div>
 		<div class="flex flex-col gap-4 px-2 md:px-4">
-			<div class="px-4 md:px-4 text-3xl">Average Deaths</div>
+			<div class="px-4 md:px-4 text-3xl">Deaths</div>
 			<div
 				class="flex flex-col gap-2 justify-center text-stone-200 bg-stone-800 rounded-lg p-2 border-stone-600 border-[1px]"
 			>
 				<table>
-					{#each bossAverageDeaths as boss, i}
+					{#each bossDeaths as boss, i}
 						<tr class={`${i !== 31 ? 'border-b-[1px] border-stone-600' : ''}`}>
 							<td class="pr-3 text-right">{i + 1}</td>
 							<td class="w-64 overflow-hidden flex px-2 pr-3">
@@ -277,7 +345,7 @@
 									on:click={() => goto(`/boss/${boss.bossId}`)}>{boss.bossName}</button
 								></td
 							>
-							<td>{Number(boss.avgDeaths).toFixed(0)}</td>
+							<td>{Number(boss.deaths).toFixed(0)}</td>
 						</tr>
 					{/each}
 				</table>
@@ -285,3 +353,88 @@
 		</div>
 	</div>
 </div>
+
+{#if visible}
+	<div
+		transition:fade={{ duration: 200 }}
+		id="backdrop"
+		class="h-screen fixed z-30 top-0 w-screen cursor-default"
+		on:click|self={toggleVisible}
+		on:keypress={(e) => e.key === 'Escape' && toggleVisible()}
+		tabindex="0"
+		role="button"
+	>
+		<div
+			transition:fly={{ x: 1000, duration: 1000 }}
+			class="absolute z-30 opacity-100 inset-y-0 right-0 w-72 bg-stone-900 p-4 text-stone-200 rounded-l-xl py-8 px-4"
+		>
+			<form class="flex flex-col gap-3 items-center" on:submit|preventDefault={handleSubmit}>
+				<div class="flex flex-col">
+					<label for="runName" class="text-sm opacity-60">Run Name</label>
+					<div
+						class="bg-stone-900 border-stone-600 border-[1px] flex gap-2 items-center rounded-lg px-2 grow text-xl max-w-screen-sm h-10 w-64"
+					>
+						<input
+							id="runName"
+							class="bg-stone-900 w-full"
+							name="name"
+							type="text"
+							bind:value={nameValue}
+						/>
+					</div>
+				</div>
+				<div class="flex flex-col">
+					<label for="gameDropdown" class="text-sm opacity-60">Game</label>
+					<div class="bg-stone-900 border-stone-600 border-[1px] rounded-lg pl-1 w-64">
+						<select
+							id="gameDropdown"
+							class="bg-stone-900 w-full rounded-lg h-10"
+							bind:value={gameValue}
+						>
+							<option selected="true" disabled="disabled">Select a Game</option>
+							{#each games as game}
+								<option value={game.gameId}>{game.gameTitle}</option>
+							{/each}
+						</select>
+					</div>
+				</div>
+				<div class="flex flex-col gap-1">
+					<label for="experience" class="text-sm opacity-60">Experience Level</label>
+					<input
+						type="range"
+						class="accent-ember"
+						id="experience"
+						min="0"
+						max={experienceDescription.size - 1}
+						bind:value={experienceValue}
+					/>
+					<div class="text-center">{experienceDescription.get(experienceValue)}</div>
+				</div>
+				{#key error}
+					<div class="h-5 text-red-500 text-center">
+						{error}
+					</div>
+				{/key}
+				<button
+					class="rounded-lg hover:bg-ember hover:border-ember border-[1px] border-stone-600 py-1 w-32 duration-200"
+					>Start</button
+				>
+			</form>
+		</div>
+	</div>
+{/if}
+
+<style>
+	#backdrop {
+		position: fixed;
+		top: 0;
+		bottom: 0;
+		right: 0;
+		left: 0;
+		background: rgba(0, 0, 0, 0.5);
+	}
+
+	select {
+		border-right: 8px solid transparent;
+	}
+</style>

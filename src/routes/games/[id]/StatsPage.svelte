@@ -8,14 +8,16 @@
 	import { onMount } from 'svelte';
 	import BossScatterGraph from '$lib/components/BossScatterGraph.svelte';
 	import BossBarChart from '$lib/components/BossBarChart.svelte';
+	import TierList from '$lib/components/TierList.svelte';
 
 	type Bosses = {
 		bossId: number;
 		bossName: string;
-		avgEnjoymentRating: string;
-		avgDifficultyRating: string;
-		avgDeaths: string;
-		combinedAverageRating: number;
+		bossImage: string;
+		enjoymentRating: string;
+		difficultyRating: string;
+		deaths: string;
+		combinedRating: number;
 		ratingCount: number;
 	};
 
@@ -49,21 +51,21 @@
 		bosses = bosses.sort((a, b) => {
 			let aValue, bValue;
 			switch (column) {
-				case 'avgDeaths':
-					aValue = a.avgDeaths !== null ? Number(a.avgDeaths) : -Infinity;
-					bValue = b.avgDeaths !== null ? Number(b.avgDeaths) : -Infinity;
+				case 'deaths':
+					aValue = a.deaths !== null ? Number(a.deaths) : -Infinity;
+					bValue = b.deaths !== null ? Number(b.deaths) : -Infinity;
 					break;
-				case 'avgDifficultyRating':
-					aValue = a.avgDifficultyRating !== null ? Number(a.avgDifficultyRating) : -Infinity;
-					bValue = b.avgDifficultyRating !== null ? Number(b.avgDifficultyRating) : -Infinity;
+				case 'difficultyRating':
+					aValue = a.difficultyRating !== null ? Number(a.difficultyRating) : -Infinity;
+					bValue = b.difficultyRating !== null ? Number(b.difficultyRating) : -Infinity;
 					break;
-				case 'avgEnjoymentRating':
-					aValue = a.avgEnjoymentRating !== null ? Number(a.avgEnjoymentRating) : -Infinity;
-					bValue = b.avgEnjoymentRating !== null ? Number(b.avgEnjoymentRating) : -Infinity;
+				case 'enjoymentRating':
+					aValue = a.enjoymentRating !== null ? Number(a.enjoymentRating) : -Infinity;
+					bValue = b.enjoymentRating !== null ? Number(b.enjoymentRating) : -Infinity;
 					break;
-				case 'combinedAverageRating':
-					aValue = a.combinedAverageRating;
-					bValue = b.combinedAverageRating;
+				case 'combinedRating':
+					aValue = a.combinedRating;
+					bValue = b.combinedRating;
 					break;
 				default:
 					aValue = a.bossName;
@@ -79,10 +81,14 @@
 			}
 		});
 	}
+
+	const updateBossRating = async (bossId: number, difficutly: number, enjoyment: number) => {
+		console.log(bossId, difficutly, enjoyment);
+	};
 </script>
 
 <div class="flex flex-col gap-8">
-	<div class="text-4xl text-center">Rankings</div>
+	<div class="text-4xl text-center">Stats</div>
 	<div class="flex flex-col gap-4 px-4 justify-center items-center">
 		<div class="flex flex-wrap gap-4 grow justify-center">
 			<div class="flex flex-col gap-4">
@@ -96,11 +102,11 @@
 										<button on:click={() => sortBy('bossName')}> Name </button>
 									</th>
 									<th class="w-12">
-										<button on:click={() => sortBy('avgDeaths')}>
+										<button on:click={() => sortBy('deaths')}>
 											<div
 												class="flex justify-center"
 												use:tippy={{
-													content: `Average Deaths`,
+													content: ` Deaths`,
 													placement: 'left'
 												}}
 											>
@@ -109,7 +115,7 @@
 										</button>
 									</th>
 									<th class="w-12">
-										<button on:click={() => sortBy('avgDifficultyRating')}>
+										<button on:click={() => sortBy('difficultyRating')}>
 											<div
 												class="flex justify-center"
 												use:tippy={{
@@ -122,7 +128,7 @@
 										</button>
 									</th>
 									<th class="w-12">
-										<button on:click={() => sortBy('avgEnjoymentRating')}>
+										<button on:click={() => sortBy('enjoymentRating')}>
 											<div
 												class="flex justify-center"
 												use:tippy={{
@@ -135,7 +141,7 @@
 										</button>
 									</th>
 									<th class="w-12">
-										<button on:click={() => sortBy('combinedAverageRating')}>
+										<button on:click={() => sortBy('combinedRating')}>
 											<div
 												class="flex justify-center"
 												use:tippy={{
@@ -161,22 +167,20 @@
 											</button>
 										</td>
 										<td class="text-center">
-											{boss.avgDeaths !== null ? Math.round(Number(boss.avgDeaths) * 10) / 10 : '-'}
+											{boss.deaths !== null ? Math.round(Number(boss.deaths) * 10) / 10 : '-'}
 										</td>
 										<td class="text-center">
-											{boss.avgDifficultyRating !== null
-												? Math.round(Number(boss.avgDifficultyRating) * 10) / 10
+											{boss.difficultyRating !== null
+												? Math.round(Number(boss.difficultyRating) * 10) / 10
 												: '-'}
 										</td>
 										<td class="text-center">
-											{boss.avgEnjoymentRating !== null
-												? Math.round(Number(boss.avgEnjoymentRating) * 10) / 10
+											{boss.enjoymentRating !== null
+												? Math.round(Number(boss.enjoymentRating) * 10) / 10
 												: '-'}
 										</td>
 										<td class="text-center">
-											{boss.combinedAverageRating !== null
-												? Math.round(Number(boss.combinedAverageRating))
-												: '-'}
+											{boss.combinedRating !== null ? Math.round(Number(boss.combinedRating)) : '-'}
 										</td>
 									</tr>
 								{/each}
@@ -198,6 +202,12 @@
 				<BossBarChart {bosses} />
 			</div>
 		</div>
+		<div class="flex flex-col gap-4 grow w-full items-center">
+			<div class="text-3xl">Tier List</div>
+			<div class="px-4 w-full flex justify-center items-center">
+				<TierList {bosses} />
+			</div>
+		</div>
 	</div>
 </div>
 
@@ -214,7 +224,6 @@
 	thead th {
 		position: sticky;
 		top: 0;
-		z-index: 1;
 		background-color: #292524;
 	}
 </style>

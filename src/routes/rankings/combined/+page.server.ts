@@ -16,12 +16,12 @@ export const load = async ({ fetch, data, params }) => {
 			bossId: bossesTable.bossId,
 			bossName: bossesTable.bossName,
 			bossGame: bossesTable.bossGame,
-			avgEnjoymentRating: avg(bossRatingsTable.enjoymentRating),
-			avgDifficultyRating: avg(bossRatingsTable.difficultyRating),
-			avgDeaths: avg(bossDeathsInRunTable.deathCount),
-			combinedAverageRating: sql`${avg(bossRatingsTable.enjoymentRating)} * ${avg(
+			enjoymentRating: avg(bossRatingsTable.enjoymentRating),
+			difficultyRating: avg(bossRatingsTable.difficultyRating),
+			deaths: avg(bossDeathsInRunTable.deathCount),
+			combinedRating: sql`((${avg(bossRatingsTable.enjoymentRating)}*0.7) + (${avg(
 				bossRatingsTable.difficultyRating
-			)}`,
+			)}*0.3))*10`,
 			ratingCount: count(bossRatingsTable.ratingId)
 		})
 		.from(bossesTable)

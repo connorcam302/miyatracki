@@ -4,6 +4,8 @@
 
 	export let data = []; // Array of games with bosses
 
+	console.log(data);
+
 	let chart;
 
 	// Function to prepare data for scatter chart
@@ -74,8 +76,8 @@
 			let gameData = {
 				label: game.gameName,
 				data: game.bosses.map((boss) => ({
-					x: parseFloat(boss.avgDifficultyRating),
-					y: parseFloat(boss.avgEnjoymentRating),
+					x: parseFloat(boss.difficultyRating),
+					y: parseFloat(boss.enjoymentRating),
 					label: boss.bossName
 				})),
 				backgroundColor: data.length > 1 ? generateColour(i) : '#F05E1B',
@@ -99,7 +101,7 @@
 				max: 10,
 				title: {
 					display: true,
-					text: 'Average Difficulty Rating',
+					text: ' Difficulty Rating',
 					color: '#e7e5e4'
 				},
 				grid: {
@@ -114,7 +116,7 @@
 				max: 10,
 				title: {
 					display: true,
-					text: 'Average Enjoyment Rating',
+					text: ' Enjoyment Rating',
 					color: '#e7e5e4'
 				},
 				grid: {

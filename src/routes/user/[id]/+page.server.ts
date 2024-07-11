@@ -1,47 +1,87 @@
 import { db } from '$lib/server/database';
 import {
+	bossDeathsInRunTable,
 	bossRatingsTable,
 	bossesTable,
 	gamesTable,
 	runsTable,
 	userTable
 } from '$lib/server/schema';
-import { eq } from 'drizzle-orm';
+import { and, avg, count, desc, eq, max, sql } from 'drizzle-orm';
 import { getDateString } from '$lib/functions';
+import gamesList from '$lib/data/games';
 
 export const load = async ({ fetch, data, params }) => {
 	const { id } = params;
 	const userData = await db.select().from(userTable).where(eq(userTable.id, id));
-	const runData = await db
-		.select()
-		.from(runsTable)
-		.where(eq(runsTable.runUser, id))
-		.innerJoin(gamesTable, eq(runsTable.gameId, gamesTable.gameId));
-	const ratingData = await db
-		.select()
-		.from(bossRatingsTable)
-		.where(eq(bossRatingsTable.userId, id))
-		.innerJoin(bossesTable, eq(bossRatingsTable.bossId, bossesTable.bossId))
-		.innerJoin(gamesTable, eq(bossesTable.bossGame, gamesTable.gameId));
-
 	const user = userData[0];
-	const runs = runData.map((run) => {
+
+	const userRuns = await db
+		.select({
+			runId: runsTable.runId,
+			runName: runsTable.runName,
+			runStartDate: runsTable.runStartDate,
+			runEndDate: runsTable.runEndDate,
+			experience: runsTable.experience,
+			bossKills: count(bossDeathsInRunTable.deathId),
+			mostRecentKillDate: max(bossDeathsInRunTable.deathDate),
+			totalBossesInGame: sql`(SELECT COUNT(*) FROM ${bossesTable} WHERE ${bossesTable.bossGame} = ${runsTable.gameId})`,
+			gameTitle: gamesTable.gameTitle
+		})
+		.from(runsTable)
+		.leftJoin(bossDeathsInRunTable, eq(runsTable.runId, bossDeathsInRunTable.runId))
+		.leftJoin(gamesTable, eq(runsTable.gameId, gamesTable.gameId))
+		.where(eq(runsTable.runUser, id))
+		.groupBy(
+			runsTable.runId,
+			runsTable.runName,
+			runsTable.runStartDate,
+			runsTable.runEndDate,
+			runsTable.experience,
+			runsTable.gameId,
+			gamesTable.gameTitle
+		)
+		.orderBy(desc(runsTable.runStartDate));
+
+	const allBosses = await db
+		.select({
+			bossId: bossesTable.bossId,
+			bossName: bossesTable.bossName,
+			bossGame: bossesTable.bossGame,
+			bossImage: bossesTable.bossImage,
+			enjoymentRating: bossRatingsTable.enjoymentRating,
+			difficultyRating: bossRatingsTable.difficultyRating,
+			deaths: sql`AVG(${bossDeathsInRunTable.deathCount})`,
+			combinedRating: sql`(
+      (${bossRatingsTable.enjoymentRating} * 0.7) + 
+      (${bossRatingsTable.difficultyRating} * 0.3)
+    ) * 10`,
+			killCount: sql`COUNT(${bossDeathsInRunTable.bossId})`
+		})
+		.from(bossesTable)
+		.leftJoin(bossRatingsTable, eq(bossesTable.bossId, bossRatingsTable.bossId))
+		.leftJoin(bossDeathsInRunTable, eq(bossesTable.bossId, bossDeathsInRunTable.bossId))
+		.leftJoin(runsTable, eq(bossDeathsInRunTable.runId, runsTable.runId))
+		.where(and(eq(runsTable.runUser, id), eq(bossRatingsTable.userId, id)))
+		.groupBy(bossesTable.bossId, bossesTable.bossName, bossesTable.bossGame)
+		.orderBy(
+			desc(
+				sql`((${avg(bossRatingsTable.enjoymentRating)}*0.7) + (${avg(
+					bossRatingsTable.difficultyRating
+				)}*0.3))*10`
+			)
+		);
+
+	const gameIds = [...new Set(allBosses.map((obj) => obj.bossGame))];
+	const games = gamesList.filter((game) => gameIds.includes(game.gameId));
+
+	const scatterData = games.map((game) => {
+		const gameBosses = allBosses.filter((boss) => boss.bossGame === game.gameId);
 		return {
-			...run.Runs,
-			game: run.Games.gameTitle,
-			runTimeString: getDateString(run.Runs.runStartDate)
+			gameName: game.gameTitle,
+			bosses: gameBosses
 		};
 	});
 
-	const ratings = ratingData.map((rating) => {
-		return {
-			...rating.BossRatings,
-			bossGame: rating.Games.gameTitle,
-			boss: rating.Bosses.bossName,
-			bossImage: rating.Bosses.bossImage,
-			ratingTimeString: getDateString(Number(rating.BossRatings.timestamp))
-		};
-	});
-
-	return { user, runs, ratings };
+	return { user, userRuns, allBosses, games, scatterData };
 };

@@ -12,26 +12,26 @@
 		let labels = bosses.map((boss) => boss.bossName);
 
 		if (mode === 'enjoymentDifficulty') {
-			let avgEnjoymentRating = bosses.map(
-				(boss) => Math.round(parseFloat(boss.avgEnjoymentRating) * 10) / 10
+			let enjoymentRating = bosses.map(
+				(boss) => Math.round(parseFloat(boss.enjoymentRating) * 10) / 10
 			);
-			let avgDifficultyRating = bosses.map(
-				(boss) => Math.round(parseFloat(boss.avgDifficultyRating) * 10) / 10
+			let difficultyRating = bosses.map(
+				(boss) => Math.round(parseFloat(boss.difficultyRating) * 10) / 10
 			);
 
 			return {
 				labels: labels,
 				datasets: [
 					{
-						label: 'Average Enjoyment Rating',
-						data: avgEnjoymentRating,
+						label: ' Enjoyment Rating',
+						data: enjoymentRating,
 						backgroundColor: '#14b8a695', // Bright Green
 						borderColor: '#14b8a6',
 						borderWidth: 1
 					},
 					{
-						label: 'Average Difficulty Rating',
-						data: avgDifficultyRating,
+						label: ' Difficulty Rating',
+						data: difficultyRating,
 						backgroundColor: '#ef444495', // Strong Blue
 						borderColor: '#ef4444',
 						borderWidth: 1
@@ -39,14 +39,14 @@
 				]
 			};
 		} else if (mode === 'deaths') {
-			let avgDeaths = bosses.map((boss) => Math.round(parseFloat(boss.avgDeaths) * 10) / 10);
+			let deaths = bosses.map((boss) => Math.round(parseFloat(boss.deaths) * 10) / 10);
 
 			return {
 				labels: labels,
 				datasets: [
 					{
-						label: 'Average Deaths',
-						data: avgDeaths,
+						label: ' Deaths',
+						data: deaths,
 						backgroundColor: '#f05e1b95', // Orange
 						borderColor: '#f05e1b',
 						borderWidth: 1

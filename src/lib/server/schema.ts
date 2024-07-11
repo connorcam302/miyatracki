@@ -67,7 +67,7 @@ export const bossRatingsTable = sqliteTable('BossRatings', {
 	bossId: integer('boss_id')
 		.notNull()
 		.references(() => bossesTable.bossId),
-	enjoymentRating: integer('enjoyment_rating').notNull(),
-	difficultyRating: integer('difficulty_rating').notNull(),
+	enjoymentRating: integer('enjoyment_rating'),
+	difficultyRating: integer('difficulty_rating'),
 	timestamp: text('timestamp')
 });

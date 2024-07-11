@@ -14,6 +14,7 @@
 	import IconoirGraphUp from 'virtual:icons/iconoir/graph-up';
 	import IconoirMagicWand from 'virtual:icons/iconoir/magic-wand';
 	import RunChart from './RunChart.svelte';
+	import { getStatColour } from '$lib/functions';
 	import tippy from 'sveltejs-tippy';
 	import dayjs from 'dayjs';
 	import advancedFormat from 'dayjs/plugin/advancedFormat';
@@ -285,12 +286,6 @@
 				bossList = bosses.filter((boss) => boss.deathDate === null && boss.deaths > 0);
 				break;
 		}
-	};
-
-	const getStatColour = (stat: number, averageStat: number) => {
-		if (stat === averageStat) return '#e7e5e4';
-		if (stat > averageStat) return '#ef4444';
-		if (stat < averageStat) return '#22c55e';
 	};
 </script>
 
@@ -748,21 +743,23 @@
 		tabindex="0"
 		role="button"
 	>
-		<div class="absolute opacity-100 w-64 bg-stone-200 rounded-xl py-8 px-4 text-stone-800">
+		<div
+			class="absolute opacity-100 w-64 text-stone-200 rounded-xl p-4 bg-stone-900 border-[1px] border-stone-600"
+		>
 			<div class="flex flex-col gap-4">
 				<div class="text-center text-lg">
-					Are you sure you wish to revive <span class="font-bold text-black"
+					Are you sure you wish to revive <span class="font-bold text-white"
 						>{currentBoss.name}</span
 					>?
 				</div>
 				<div class="flex mx-4">
 					<button
-						class="p-2 px-4 w-20 rounded-full text-stone-200 bg-red-800"
+						class="p-2 px-4 w-20 border-stone-600 hover:bg-ember hover:border-ember duration-200 border-[1px] rounded-lg"
 						on:click={() => toggleReviveModal()}>Cancel</button
 					>
 					<div class="grow" />
 					<button
-						class="p-2 px-4 w-20 rounded-full text-stone-200 bg-black"
+						class="p-2 px-4 w-20 border-stone-600 hover:bg-ember hover:border-ember duration-200 border-[1px] rounded-lg"
 						on:click={() => reviveBoss(currentBoss)}>Revive</button
 					>
 				</div>
@@ -780,20 +777,30 @@
 		tabindex="0"
 		role="button"
 	>
-		<div class="absolute opacity-100 w-64 bg-stone-200 rounded-xl py-8 px-4 text-stone-800">
+		<div
+			class="absolute opacity-100 w-64 text-stone-200 rounded-xl p-4 bg-stone-900 border-[1px] border-stone-600"
+		>
 			<div class="flex flex-col gap-4">
 				<div class="text-center text-lg">
-					Set <span class="font-bold text-black">{currentBoss.name}</span> Death Count
+					Set <span class="font-bold text-white">{currentBoss.name}</span> Death Count
 				</div>
-				<input class="mx-4 text-center" type="number" bind:value={setDeathsValue} />
+				<div
+					class="bg-stone-900 border-stone-600 border-[1px] flex gap-2 items-center rounded-lg px-2 grow"
+				>
+					<input
+						class="bg-stone-900 w-full pr-2 text-center"
+						type="number"
+						bind:value={setDeathsValue}
+					/>
+				</div>
 				<div class="flex mx-4">
 					<button
-						class="p-2 px-4 w-20 rounded-full text-stone-200 bg-red-800"
+						class="p-2 px-4 w-20 border-stone-600 hover:bg-ember hover:border-ember duration-200 border-[1px] rounded-lg"
 						on:click={() => toggleSetDeathsModal()}>Cancel</button
 					>
 					<div class="grow" />
 					<button
-						class="p-2 px-4 w-20 rounded-full text-stone-200 bg-black"
+						class="p-2 px-4 w-20 border-stone-600 hover:bg-ember hover:border-ember duration-200 border-[1px] rounded-lg"
 						on:click={() => setDeaths(currentBoss, setDeathsValue)}>Set</button
 					>
 				</div>
@@ -806,12 +813,14 @@
 		transition:fade={{ duration: 200 }}
 		id="backdrop"
 		class="h-screen fixed top-0 w-screen cursor-default flex justify-center items-center"
-		on:click|self={() => toggleReviveModal()}
-		on:keypress={(e) => e.key === 'Escape' && toggleReviveModal()}
+		on:click|self={() => toggleRatingModal()}
+		on:keypress={(e) => e.key === 'Escape' && toggleRatingModal()}
 		tabindex="0"
 		role="button"
 	>
-		<div class="absolute opacity-100 w-64 bg-stone-200 rounded-xl p-4 text-stone-800">
+		<div
+			class="absolute opacity-100 w-64 text-stone-200 rounded-xl p-4 bg-stone-900 border-[1px] border-stone-600"
+		>
 			<div class="flex flex-col gap-2 justify-center items-center w-full">
 				<div>Rate <span class="font-bold">{currentBoss.name}</span></div>
 				<div class="flex w-full gap-4">
@@ -826,7 +835,7 @@
 							bind:value={userDifficultyRating}
 						/>
 					</div>
-					<div>{userDifficultyRating}</div>
+					<div class="text-title text-xl">{userDifficultyRating}</div>
 				</div>
 
 				<div class="flex w-full gap-4">
@@ -841,14 +850,14 @@
 							bind:value={userEnjoymentRating}
 						/>
 					</div>
-					<div class="text-title">{userEnjoymentRating}</div>
+					<div class="text-title text-xl">{userEnjoymentRating}</div>
 				</div>
 				<div class="h-2" />
 				<button
 					on:click={() => rateBoss()}
-					class="text-xl bg-stone-200 text-black p-2 px-4 rounded-full w-32"
+					class="border-stone-600 hover:bg-ember hover:border-ember duration-200 border-[1px] rounded-lg px-1 w-32"
 				>
-					<div class="bg-black text-stone-200 p-2 rounded-full">Submit</div>
+					<div class="py-1 text-xl">Submit</div>
 				</button>
 				<div class="h-4 text-red-800 text-md">{errorText}</div>
 			</div>
