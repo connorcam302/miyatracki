@@ -56,8 +56,6 @@
 		if (deaths > averageDeaths) return '#ef4444';
 		if (deaths < averageDeaths) return '#22c55e';
 	};
-
-	console.log(runData, reports);
 </script>
 
 <div>

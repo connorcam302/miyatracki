@@ -111,10 +111,6 @@ export const load = async ({ fetch, data, params }) => {
 		};
 	});
 
-	console.log(bossAverages);
-
-	console.log(bossData.find((data) => data.bossId === 196));
-
 	const gameDlcs = await db
 		.select({
 			dlcId: dlcTable.dlcId,
@@ -144,7 +140,6 @@ export const load = async ({ fetch, data, params }) => {
 	});
 
 	const trimmedBossData = bossesArray.filter((average) => average.deathDate !== 0);
-	console.log(trimmedBossData);
 
 	const reports = [
 		{

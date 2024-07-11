@@ -81,10 +81,6 @@
 			}
 		});
 	}
-
-	const updateBossRating = async (bossId: number, difficutly: number, enjoyment: number) => {
-		console.log(bossId, difficutly, enjoyment);
-	};
 </script>
 
 <div class="flex flex-col gap-8">

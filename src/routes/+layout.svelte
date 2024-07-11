@@ -95,8 +95,6 @@
 			.then((res) => res.json())
 			.then((data) => data.data);
 
-		console.log(searchResults);
-
 		searchResults = results;
 		return;
 	};

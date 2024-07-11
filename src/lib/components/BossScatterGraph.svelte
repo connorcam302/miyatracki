@@ -4,8 +4,6 @@
 
 	export let data = []; // Array of games with bosses
 
-	console.log(data);
-
 	let chart;
 
 	// Function to prepare data for scatter chart

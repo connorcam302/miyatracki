@@ -9,7 +9,6 @@
 
 	export let data = [];
 	const { game, bosses, allRuns, userData } = data;
-	console.log(data);
 
 	$: pageState = 'stats';
 </script>
