@@ -7,7 +7,7 @@ import {
 	runsTable,
 	userTable
 } from '$lib/server/schema';
-import { and, avg, count, desc, eq, max, sql } from 'drizzle-orm';
+import { and, avg, count, desc, eq, max, ne, sql, or } from 'drizzle-orm';
 import { getDateString } from '$lib/functions';
 import gamesList from '$lib/data/games';
 
@@ -62,15 +62,25 @@ export const load = async ({ fetch, data, params }) => {
 		.leftJoin(bossRatingsTable, eq(bossesTable.bossId, bossRatingsTable.bossId))
 		.leftJoin(bossDeathsInRunTable, eq(bossesTable.bossId, bossDeathsInRunTable.bossId))
 		.leftJoin(runsTable, eq(bossDeathsInRunTable.runId, runsTable.runId))
-		.where(and(eq(runsTable.runUser, id), eq(bossRatingsTable.userId, id)))
-		.groupBy(bossesTable.bossId, bossesTable.bossName, bossesTable.bossGame)
+		.where(eq(bossRatingsTable.userId, id))
+		.groupBy(
+			bossesTable.bossId,
+			bossesTable.bossName,
+			bossesTable.bossGame,
+			bossesTable.bossImage,
+			bossRatingsTable.enjoymentRating,
+			bossRatingsTable.difficultyRating
+		)
 		.orderBy(
 			desc(
-				sql`((${avg(bossRatingsTable.enjoymentRating)}*0.7) + (${avg(
-					bossRatingsTable.difficultyRating
-				)}*0.3))*10`
+				sql`(
+        (AVG(${bossRatingsTable.enjoymentRating}) * 0.7) + 
+        (AVG(${bossRatingsTable.difficultyRating}) * 0.3)
+      ) * 10`
 			)
 		);
+
+	console.log(allBosses);
 
 	const gameIds = [...new Set(allBosses.map((obj) => obj.bossGame))];
 	const games = gamesList.filter((game) => gameIds.includes(game.gameId));

@@ -31,8 +31,6 @@
 
 	export let data;
 
-	console.log(data);
-
 	$: viewport = getContext('viewport');
 
 	$: userDifficultyRating = null;
@@ -52,7 +50,6 @@
 		newEnjoymentRating: number,
 		ratingType: string
 	) => {
-		console.log(newDifficultyRating, newEnjoymentRating);
 		const response = await fetch(
 			`/api/boss/${bossId}/user/${data.userData.id}?difficulty=${userDifficultyRating}&enjoyment=${userEnjoymentRating}`,
 			{

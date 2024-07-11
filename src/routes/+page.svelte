@@ -37,7 +37,6 @@
 
 	export let data;
 	const { userData, bossRankings, bossDeaths, games } = data;
-	console.log(data);
 
 	$: pageNumber = 1;
 	const limit = 5;

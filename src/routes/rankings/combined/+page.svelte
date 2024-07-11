@@ -3,7 +3,6 @@
 
 	export let data = [];
 	const { bossByGame } = data;
-	console.log(bossByGame);
 </script>
 
 <div>

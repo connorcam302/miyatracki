@@ -4,6 +4,7 @@
 	import IconoirMagicWand from 'virtual:icons/iconoir/magic-wand';
 	import IconoirRulerCombine from 'virtual:icons/iconoir/ruler-combine';
 	import { fade } from 'svelte/transition';
+	import { goto } from '$app/navigation';
 
 	type Boss = {
 		bossId: number;
@@ -33,7 +34,7 @@
 			tierColour: 'bg-red-500',
 			tierOrder: 1,
 			tierContent: [],
-			tierStart: 85
+			tierStart: 87
 		},
 		{
 			tierId: 2,
@@ -49,7 +50,7 @@
 			tierColour: 'bg-yellow-500',
 			tierOrder: 3,
 			tierContent: [],
-			tierStart: 65
+			tierStart: 68
 		},
 		{
 			tierId: 4,
@@ -57,7 +58,7 @@
 			tierColour: 'bg-green-500',
 			tierOrder: 4,
 			tierContent: [],
-			tierStart: 50
+			tierStart: 52
 		},
 		{
 			tierId: 5,
@@ -65,7 +66,7 @@
 			tierColour: 'bg-cyan-500',
 			tierOrder: 5,
 			tierContent: [],
-			tierStart: 30
+			tierStart: 35
 		},
 		{
 			tierId: 6,
@@ -73,7 +74,7 @@
 			tierColour: 'bg-blue-500',
 			tierOrder: 6,
 			tierContent: [],
-			tierStart: 15
+			tierStart: 20
 		},
 		{
 			tierId: 7,
@@ -105,8 +106,6 @@
 			tiers[6].tierContent.push(boss);
 		}
 	});
-	$: console.log(bosses);
-	console.log(tiers);
 </script>
 
 <div class="flex flex-col max-w-screen-lg">
@@ -127,7 +126,7 @@
 				{#key bosses}
 					<div class="flex flex-wrap gap-1" in:fade={{ delay: 120, duration: 250 }}>
 						{#each tier.tierContent as boss}
-							<button>
+							<button class="relative" on:click={() => goto('/boss/' + boss.bossId)}>
 								<img
 									class="h-32 w-32"
 									src={boss.bossImage}
@@ -159,6 +158,11 @@
 										allowHTML: true
 									}}
 								/>
+								<div
+									class="px-1 absolute z-10 bottom-0 text-xs left-0 right-0 bg-black bg-opacity-50"
+								>
+									{boss.bossName}
+								</div>
 							</button>
 						{/each}
 					</div>

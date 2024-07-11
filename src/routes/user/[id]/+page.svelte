@@ -16,13 +16,11 @@
 	dayjs.extend(relativeTime);
 
 	export let data;
-	console.log(data);
 
 	let { user, allBosses, games, userRuns, scatterData } = data;
 	const { displayName, profilePicture } = user;
 
 	$: bosses = allBosses;
-	console.log(bosses);
 	$: activeGames = games.map((game) => game.gameId);
 	const activeGameToggle = (gameId) => {
 		activeGames.includes(gameId)
