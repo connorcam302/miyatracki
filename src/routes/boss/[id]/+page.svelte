@@ -22,6 +22,7 @@
 	import { getStatColour, getExperienceTitle } from '$lib/functions';
 	import { fade } from 'svelte/transition';
 	import tippy from 'sveltejs-tippy';
+	import games from '$lib/data/games.ts';
 
 	const props = {
 		content: "<span class='tooltip'>Intermediate</span>",
@@ -40,6 +41,7 @@
 	$: userRuns = [];
 
 	$: updateButton = 'Update';
+	console.log(data);
 
 	const { boss } = data;
 
@@ -92,8 +94,16 @@
 
 <div class="mx-auto py-4 px-2" in:fade={{ duration: 500 }}>
 	<div class="flex flex-col gap-4 justify-center items-center">
-		<div class="text-4xl font-title w-80 md:w-96 text-center mx-auto">
-			{boss.bossName}
+		<div class="w-80 md:w-96 text-center mx-auto">
+			<div class="text-4xl font-title">
+				{boss.bossName}
+			</div>
+			<button
+				on:click={() => goto('/games/' + boss.bossGame)}
+				class="text-lg font-title hover:text-stone-400 duration-200"
+			>
+				{games.find((game) => game.gameId === boss.bossGame).gameTitle}
+			</button>
 		</div>
 		<div class="flex flex-wrap justify-center gap-4">
 			<img class="h-96 md:h-96" src={boss.bossImage} alt={boss.bossName} />
