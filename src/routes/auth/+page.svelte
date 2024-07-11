@@ -20,8 +20,8 @@
 	const providers = ['google', 'discord', 'twitch'];
 </script>
 
-<div>
-	<div class="bg-stone-900 bg-opacity-90 p-6 rounded-2xl">
+<div class="m-auto h-full">
+	<div class="bg-stone-900 bg-opacity-100 border-[1px] border-stone-600 p-6 rounded-2xl">
 		<div class="text-center">
 			<h1 class="text-3xl text-white pb-6">Sign up or Sign in</h1>
 			<div class="w-full bg-white bg-opacity-70 h-0.5" />
