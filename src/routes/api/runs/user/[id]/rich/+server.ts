@@ -11,10 +11,10 @@ import {
 } from '$lib/server/schema';
 import { and, desc, eq, sql } from 'drizzle-orm';
 
-export const GET: RequestHandler = async ({ url }) => {
+export const GET: RequestHandler = async ({ url, params }) => {
     console.log(url.pathname, 'requested.');
-    const page = Number(url.searchParams.get('page'));
-    const limit = Number(url.searchParams.get('limit')) || 5;
+    const page = url.searchParams.get('page') || 1;
+    const id = Number(params.id);
     console.log(page);
     try {
         const runs = await db
@@ -27,7 +27,6 @@ export const GET: RequestHandler = async ({ url }) => {
                 experience: runsTable.experience,
                 bossId: bossDeathsInRunTable.bossId,
                 bossName: bossesTable.bossName,
-                bossImage: bossesTable.bossImage,
                 deathDate: bossDeathsInRunTable.deathDate,
                 deathCount: bossDeathsInRunTable.deathCount,
                 enjoymentRating: bossRatingsTable.enjoymentRating,
@@ -45,10 +44,10 @@ export const GET: RequestHandler = async ({ url }) => {
                     eq(bossDeathsInRunTable.bossId, bossRatingsTable.bossId)
                 )
             )
-            .where(sql`${bossDeathsInRunTable.deathDate} IS NOT NULL`)
+            .where(and(sql`${bossDeathsInRunTable.deathDate} IS NOT NULL`, eq(runsTable.runUser, id)))
             .orderBy(desc(bossDeathsInRunTable.deathDate))
-            .limit(limit + 1)
-            .offset((page - 1) * limit);
+            .limit(6)
+            .offset((Number(page) - 1) * 5);
 
         return json(customResponse(200, `Ok`, runs));
     } catch (error) {

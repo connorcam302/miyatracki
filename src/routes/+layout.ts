@@ -19,8 +19,11 @@ export const load = async ({ fetch, data, depends, url }) => {
 		const userDataResponse = await fetch(`/api/user/uid/${data.session.user.id}`);
 		const userDataJson = await userDataResponse.json();
 		const userData: userDataType = userDataJson.data[0];
+		const runsFull = await fetch(`/api/runs/user/${userData.id}`).then((res) => res.json());
 
-		return { supabase, session, userData, url: url.pathname };
+		const runs = runsFull.data;
+
+		return { supabase, session, userData, url: url.pathname, runs };
 	} else {
 		return { supabase, session, userData: null, url: url.pathname };
 	}

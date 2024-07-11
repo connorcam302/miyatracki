@@ -6,7 +6,10 @@ html {
 	scroll-behavior: smooth;
 	@apply text-stone-200;
 }
-
+body {
+	background-color: #1c1917;
+}
+/*
 body {
 	background-color: hsla(106, 0%, 9%, 1);
 	background-image: radial-gradient(at 20% 89%, hsla(19, 52%, 20%, 0.43) 0px, transparent 50%),
@@ -19,6 +22,7 @@ body {
 	background-repeat: no-repeat;
 	background-size: cover;
 }
+*/
 
 input {
 	outline: none;
@@ -29,7 +33,7 @@ html {
 }
 
 html::-webkit-scrollbar {
-	width: 8px;
+	width: 4px;
 }
 
 html::-webkit-scrollbar-thumb {

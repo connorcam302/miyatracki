@@ -31,13 +31,19 @@ export const POST: RequestHandler = async ({ url, params }) => {
 	console.log(url.pathname, 'requested.');
 	const bossId = Number(params.bossId);
 	const userId = Number(params.userId);
-	const difficulty = Number(url.searchParams.get('difficulty'));
-	const enjoyment = Number(url.searchParams.get('enjoyment'));
 
-	if (difficulty < 0 || difficulty > 10 || enjoyment < 0 || enjoyment > 10) {
-		return json(customResponse(400, 'Invalid rating values.'));
-	}
+	const parseRating = (rating: string) => {
+		if (rating === 'null') {
+			return null;
+		} else {
+			return Number(rating);
+		}
+	};
 
+	const difficulty = parseRating(url.searchParams.get('difficulty'));
+	const enjoyment = parseRating(url.searchParams.get('enjoyment'));
+
+	console.log(difficulty, enjoyment);
 	try {
 		const dataArray = await db
 			.select()

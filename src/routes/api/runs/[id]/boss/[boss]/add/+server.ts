@@ -34,12 +34,12 @@ export const POST: RequestHandler = async ({ url, params }) => {
 			})
 			.returning();
 		return json(customResponse(200, 'Created boss death.', [data]));
+	} else {
+		const data = await db
+			.update(bossDeathsInRunTable)
+			.set({ deathCount: bossDeathsCurrent[0].deathCount + 1 })
+			.where(and(eq(bossDeathsInRunTable.runId, id), eq(bossDeathsInRunTable.bossId, boss)))
+			.returning();
+		return json(customResponse(200, `Updated boss death count.`, [data]));
 	}
-
-	const data = await db
-		.update(bossDeathsInRunTable)
-		.set({ deathCount: bossDeathsCurrent[0].deathCount + 1 })
-		.where(and(eq(bossDeathsInRunTable.runId, id), eq(bossDeathsInRunTable.bossId, boss)))
-		.returning();
-	return json(customResponse(200, `Updated boss death count.`, [data]));
 };

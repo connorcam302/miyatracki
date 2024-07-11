@@ -7,28 +7,52 @@ import {
 	runsTable,
 	userTable
 } from '$lib/server/schema';
-import { and, desc, eq, sql } from 'drizzle-orm';
+import { and, asc, avg, count, desc, eq, sql } from 'drizzle-orm';
+import gameList from '$lib/data/games';
 
 export const load = async ({ fetch, data, params }) => {
-	const runs = await db
+	const bossRankings = await db
 		.select({
-			runName: runsTable.runName,
-			displayName: userTable.displayName,
-			lastBossKilled: bossesTable.bossName
+			bossId: bossesTable.bossId,
+			bossName: bossesTable.bossName,
+			enjoymentRating: avg(bossRatingsTable.enjoymentRating),
+			difficultyRating: avg(bossRatingsTable.difficultyRating),
+
+			combinedRating: sql`((${avg(bossRatingsTable.enjoymentRating)}*0.7) + (${avg(
+				bossRatingsTable.difficultyRating
+			)}*0.3))*10`,
+
+			ratingCount: count(bossRatingsTable.ratingId)
 		})
-		.from(runsTable)
-		.innerJoin(userTable, eq(runsTable.runUser, userTable.id))
-		.innerJoin(gamesTable, eq(runsTable.gameId, gamesTable.gameId))
-		.innerJoin(bossDeathsInRunTable, eq(runsTable.runId, bossDeathsInRunTable.runId))
-		.innerJoin(bossesTable, eq(bossDeathsInRunTable.bossId, bossesTable.bossId))
-		.leftJoin(
-			bossRatingsTable,
-			and(
-				eq(runsTable.runUser, bossRatingsTable.userId),
-				eq(bossDeathsInRunTable.bossId, bossRatingsTable.bossId)
+		.from(bossesTable)
+		.leftJoin(bossRatingsTable, eq(bossesTable.bossId, bossRatingsTable.bossId))
+		.groupBy(bossesTable.bossId, bossesTable.bossName)
+		.having(sql`${count(bossRatingsTable.ratingId)} >= 2`)
+		.orderBy(
+			desc(
+				sql`((${avg(bossRatingsTable.enjoymentRating)}*0.7) + (${avg(
+					bossRatingsTable.difficultyRating
+				)}*0.3))*10`
 			)
 		)
-		.where(sql`${bossDeathsInRunTable.deathDate} IS NOT NULL`)
-		.orderBy(desc(bossDeathsInRunTable.deathDate));
-	console.log(runs);
+		.limit(32);
+
+	const bossDeaths = await db
+		.select({
+			bossId: bossesTable.bossId,
+			bossName: bossesTable.bossName,
+			deaths: avg(bossDeathsInRunTable.deathCount),
+			runCount: count(runsTable.runId)
+		})
+		.from(bossesTable)
+		.leftJoin(bossDeathsInRunTable, eq(bossesTable.bossId, bossDeathsInRunTable.bossId))
+		.leftJoin(runsTable, eq(bossDeathsInRunTable.runId, runsTable.runId))
+		.groupBy(bossesTable.bossId, bossesTable.bossName)
+		.having(sql`${count(runsTable.runId)} >= 2`)
+		.orderBy(desc(avg(bossDeathsInRunTable.deathCount)))
+		.limit(32);
+
+	const games = gameList;
+
+	return { bossRankings, bossDeaths, games };
 };
