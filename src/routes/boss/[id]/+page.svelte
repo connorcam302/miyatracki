@@ -172,7 +172,7 @@
 					</div>
 					<div class="grow" />
 					<div class="flex gap-2 px-2 text-xl">
-						<IconoirGym />
+						<IconoirMagicWand />
 						<input
 							type="range"
 							class="accent-ember w-24 md:w-48"

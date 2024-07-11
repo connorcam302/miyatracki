@@ -121,7 +121,7 @@
 <svelte:window bind:innerWidth bind:innerHeight />
 
 <div class="min-h-screen flex flex-col">
-	{#if $page.url.pathname !== '/auth'}
+	{#if !$page.url.pathname.includes('/auth')}
 		<div class="px-2 py-5 text-lg text-stone-200 border-stone-700 border-b-[1px]">
 			<div class="min-w-screen flex mx-auto">
 				<div class="flex-1 flex justify-start items-center">
@@ -271,7 +271,7 @@
 			</div>
 		</div>
 	{/if}
-	{#if $page.url.pathname !== '/auth'}
+	{#if !$page.url.pathname.includes('/auth')}
 		{#key data.url}
 			<div class="grow flex">
 				<div class="text-stone-300">
@@ -375,9 +375,7 @@
 			</div>
 		{/key}
 	{:else}
-		<div>
-			<slot />
-		</div>
+		<slot />
 	{/if}
 </div>
 
