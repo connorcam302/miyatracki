@@ -30,5 +30,9 @@ export default [
 	{
 		gameId: 8,
 		gameTitle: 'Lies of P'
+	},
+	{
+		gameId: 9,
+		gameTitle: 'Elden Ring Nightreign '
 	}
 ];
