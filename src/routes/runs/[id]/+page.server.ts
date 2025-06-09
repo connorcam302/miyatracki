@@ -110,7 +110,7 @@ export const load = async ({ fetch, data, params }) => {
 			id: boss.bossId,
 			bossImage:
 				boss.bossImage ??
-				'https://epnhpyyerjkkyxartywd.supabase.co/storage/v1/object/public/boss-images/ds1/asylumdemon.webp',
+				'https://epnhpyyerjkkyxartywd.supabase.co/storage/v1/object/public/boss-images//aborr.png',
 			name: boss.bossName,
 			deaths: death?.deathCount ?? 0,
 			deathDate: death?.deathDate ?? null,
